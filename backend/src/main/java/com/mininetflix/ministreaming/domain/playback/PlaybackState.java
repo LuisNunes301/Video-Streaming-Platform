@@ -1,4 +1,4 @@
-package com.mininetflix.ministreaming;
+package com.mininetflix.ministreaming.domain.playback;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

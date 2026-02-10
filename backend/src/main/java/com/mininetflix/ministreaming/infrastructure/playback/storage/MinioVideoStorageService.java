@@ -1,23 +1,24 @@
-package com.mininetflix.ministreaming;
-
-import org.springframework.stereotype.Service;
-
-import io.minio.MinioClient;
+package com.mininetflix.ministreaming.infrastructure.storage;
 
 import io.minio.GetPresignedObjectUrlArgs;
+import io.minio.MinioClient;
 import io.minio.http.Method;
+import org.springframework.stereotype.Component;
+
+import com.mininetflix.ministreaming.application.playback.port.VideoStorageService;
+
 import java.util.concurrent.TimeUnit;
 
-@Service
-public class VideoStorageService {
+@Component
+public class MinioVideoStorageService implements VideoStorageService {
+
     private final MinioClient minioClient;
 
-    public VideoStorageService(
-            MinioClient minioClient) {
+    public MinioVideoStorageService(MinioClient minioClient) {
         this.minioClient = minioClient;
-
     }
 
+    @Override
     public String generatePresignedUrl(String objectPath) {
         try {
             return minioClient.getPresignedObjectUrl(
