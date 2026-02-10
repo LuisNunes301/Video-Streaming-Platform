@@ -1,4 +1,4 @@
-package com.mininetflix.ministreaming.infrastructure.storage;
+package com.mininetflix.ministreaming.infrastructure.playback.storage;
 
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;

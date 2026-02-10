@@ -4,10 +4,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mininetflix.ministreaming.application.playback.port.VideoStorageService;
 import com.mininetflix.ministreaming.application.playback.usecase.SavePlaybackProgressUseCase;
 import com.mininetflix.ministreaming.application.playback.usecase.StartPlaybackUseCase;
-import com.mininetflix.ministreaming.application.playback.usecase.StartPlaybackUseCaseImpl;
 
 import com.mininetflix.ministreaming.domain.playback.PlaybackState;
 import com.mininetflix.ministreaming.web.playback.dto.PlaybackProgressRequest;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.http.ResponseEntity;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/playback")

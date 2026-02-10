@@ -1,4 +1,4 @@
-package com.mininetflix.ministreaming.infrastructure.storage;
+package com.mininetflix.ministreaming.infrastructure.playback.storage;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Bean;
