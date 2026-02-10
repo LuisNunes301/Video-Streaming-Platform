@@ -1,6 +1,6 @@
 package com.mininetflix.ministreaming.application.playback.usecase;
 
-import com.mininetflix.ministreaming.application.dto.StartPlaybackOutput;
+import com.mininetflix.ministreaming.application.playback.dto.StartPlaybackOutput;
 import com.mininetflix.ministreaming.application.playback.port.PlaybackRepository;
 import com.mininetflix.ministreaming.application.playback.port.VideoStorageService;
 import org.springframework.stereotype.Service;

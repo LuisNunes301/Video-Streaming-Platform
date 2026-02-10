@@ -19,13 +19,14 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/playback")
-@CrossOrigin(origins = "http://localhost:3001", allowedHeaders = "*", methods = {
-                RequestMethod.GET,
-                RequestMethod.POST,
-                RequestMethod.PUT,
-                RequestMethod.DELETE,
-                RequestMethod.OPTIONS
-})
+// @CrossOrigin(origins = "http://localhost:3001", allowedHeaders = "*", methods
+// = {
+// RequestMethod.GET,
+// RequestMethod.POST,
+// RequestMethod.PUT,
+// RequestMethod.DELETE,
+// RequestMethod.OPTIONS
+// })
 public class PlaybackController {
 
         private final StartPlaybackUseCase startPlaybackUseCase;
