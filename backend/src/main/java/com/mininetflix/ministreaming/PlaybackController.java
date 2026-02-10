@@ -1,9 +1,11 @@
 package com.mininetflix.ministreaming;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.http.ResponseEntity;
 import java.util.Map;
@@ -11,6 +13,13 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/playback")
+@CrossOrigin(origins = "http://localhost:3001", allowedHeaders = "*", methods = {
+        RequestMethod.GET,
+        RequestMethod.POST,
+        RequestMethod.PUT,
+        RequestMethod.DELETE,
+        RequestMethod.OPTIONS
+})
 public class PlaybackController {
     private final VideoStorageService videoStorageService;
     private final PlaybackService playbackService;
