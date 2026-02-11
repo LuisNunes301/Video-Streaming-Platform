@@ -1,4 +1,4 @@
-package com.mininetflix.ministreaming.config;
+package com.mininetflix.ministreaming.infrastructure.user.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -8,6 +8,7 @@ import com.mininetflix.ministreaming.domain.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
@@ -25,7 +26,7 @@ import lombok.Setter;
 public class UserEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(nullable = false, unique = true)
@@ -39,12 +40,9 @@ public class UserEntity {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    @Version
-    private Long version;
 
     public static UserEntity fromDomain(User user) {
         UserEntity e = new UserEntity();
-        e.id = user.getId();
         e.name = user.getName();
         e.email = user.getEmail();
         e.PasswordHash = user.getPasswordHash();

@@ -1,4 +1,4 @@
-package com.mininetflix.ministreaming.web.playback.dto;
+package com.mininetflix.ministreaming.web.controller.playback.dto;
 
 public class PlaybackProgressRequest {
 

@@ -7,6 +7,7 @@ import com.mininetflix.ministreaming.application.user.dto.AuthenticateUserOutput
 import com.mininetflix.ministreaming.application.user.port.PasswordEncoder;
 import com.mininetflix.ministreaming.application.user.port.TokenService;
 import com.mininetflix.ministreaming.application.user.port.UserRepository;
+import com.mininetflix.ministreaming.domain.user.exception.InvalidCredentialsException;
 
 @Service
 public class AuthenticateUserUseCaseImpl implements AuthenticateUserUseCase {
@@ -28,11 +29,11 @@ public class AuthenticateUserUseCaseImpl implements AuthenticateUserUseCase {
     public AuthenticateUserOutput execute(AuthenticateUserInput input) {
         // Busca o usuário pelo email
         var user = userRepository.findByEmail(input.email())
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+                .orElseThrow(InvalidCredentialsException::new);
 
         // Verifica a senha
         if (!passwordEncoder.matches(input.password(), user.getPasswordHash())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new InvalidCredentialsException();
         }
 
         // Gera o token JWT

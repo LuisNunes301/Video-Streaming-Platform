@@ -13,7 +13,7 @@ public class UserSecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new com.mininetflix.ministreaming.infrastructure.user.security.BCryptPasswordEncoderAdapter();
+        return new BCryptPasswordEncoderAdapter();
     }
 
     @Bean

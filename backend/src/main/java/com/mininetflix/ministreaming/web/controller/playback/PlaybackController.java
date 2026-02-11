@@ -1,4 +1,4 @@
-package com.mininetflix.ministreaming.web.playback;
+package com.mininetflix.ministreaming.web.controller.playback;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -8,7 +8,7 @@ import com.mininetflix.ministreaming.application.playback.usecase.SavePlaybackPr
 import com.mininetflix.ministreaming.application.playback.usecase.StartPlaybackUseCase;
 
 import com.mininetflix.ministreaming.domain.playback.PlaybackState;
-import com.mininetflix.ministreaming.web.playback.dto.PlaybackProgressRequest;
+import com.mininetflix.ministreaming.web.controller.playback.dto.PlaybackProgressRequest;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

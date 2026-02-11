@@ -10,6 +10,8 @@ import com.mininetflix.ministreaming.application.user.dto.RegisterUserInput;
 import com.mininetflix.ministreaming.application.user.port.PasswordEncoder;
 import com.mininetflix.ministreaming.application.user.port.UserRepository;
 import com.mininetflix.ministreaming.domain.user.User;
+import com.mininetflix.ministreaming.domain.user.exception.EmailAlreadyExistsException;
+import com.mininetflix.ministreaming.domain.user.exception.NameAlreadyExistsExecption;
 
 @Service
 public class RegisterUserUseCaseImpl
@@ -30,15 +32,15 @@ public class RegisterUserUseCaseImpl
     public void execute(RegisterUserInput input) {
 
         if (userRepository.existsByEmail(input.email())) {
-            throw new RuntimeException("Email already in use");
+            throw new EmailAlreadyExistsException(input.email());
         }
 
         if (userRepository.existsByName(input.name())) {
-            throw new RuntimeException("Username already in use");
+            throw new NameAlreadyExistsExecption(input.name());
         }
 
         User user = new User(
-                UUID.randomUUID(),
+                null,
                 input.name(),
                 input.email(),
                 passwordEncoder.encode(input.password()),
