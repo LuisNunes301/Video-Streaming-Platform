@@ -12,9 +12,10 @@ import com.mininetflix.ministreaming.web.controller.playback.dto.PlaybackProgres
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import java.util.Map;
 
 @RestController
@@ -42,7 +43,10 @@ public class PlaybackController {
         @PostMapping("/start/{contentId}")
         public ResponseEntity<?> start(
                         @PathVariable String contentId) {
-                String userId = "1"; // fake
+                String userId = (String) SecurityContextHolder
+                                .getContext()
+                                .getAuthentication()
+                                .getPrincipal();
 
                 var output = startPlaybackUseCase.execute(userId, contentId);
 

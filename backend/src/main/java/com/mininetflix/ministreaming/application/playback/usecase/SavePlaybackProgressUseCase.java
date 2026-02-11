@@ -1,7 +1,5 @@
 package com.mininetflix.ministreaming.application.playback.usecase;
 
-import com.mininetflix.ministreaming.domain.playback.PlaybackState;
-
 public interface SavePlaybackProgressUseCase {
-    void execute(PlaybackState state);
+    void execute(String userId, String contentId, double currentTime);
 }

@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.mininetflix.ministreaming.domain.playback.exception.VideoNotFoundException;
 import com.mininetflix.ministreaming.domain.user.exception.EmailAlreadyExistsException;
 import com.mininetflix.ministreaming.domain.user.exception.InvalidCredentialsException;
 import com.mininetflix.ministreaming.web.dto.ErrorResponse;
@@ -22,15 +23,15 @@ public class GlobalExceptionHandler {
                                                 ex.getMessage()));
         }
 
-        @ExceptionHandler(RuntimeException.class)
-        public ResponseEntity<ErrorResponse> handleGeneric(RuntimeException ex) {
+        // @ExceptionHandler(RuntimeException.class)
+        // public ResponseEntity<ErrorResponse> handleGeneric(RuntimeException ex) {
 
-                return ResponseEntity
-                                .status(400)
-                                .body(new ErrorResponse(
-                                                "BUSINESS_ERROR",
-                                                ex.getMessage()));
-        }
+        // return ResponseEntity
+        // .status(400)
+        // .body(new ErrorResponse(
+        // "BUSINESS_ERROR",
+        // ex.getMessage()));
+        // }
 
         @ExceptionHandler(InvalidCredentialsException.class)
         public ResponseEntity<ErrorResponse> handleInvalidCredentials(
@@ -40,6 +41,17 @@ public class GlobalExceptionHandler {
                                 .status(401)
                                 .body(new ErrorResponse(
                                                 "INVALID_CREDENTIALS",
+                                                ex.getMessage()));
+        }
+
+        @ExceptionHandler(VideoNotFoundException.class)
+        public ResponseEntity<ErrorResponse> handleVideoNotFound(
+                        VideoNotFoundException ex) {
+
+                return ResponseEntity
+                                .status(404)
+                                .body(new ErrorResponse(
+                                                "VIDEO_NOT_FOUND",
                                                 ex.getMessage()));
         }
 }

@@ -1,8 +1,13 @@
 package com.mininetflix.ministreaming.application.playback.usecase;
 
+import com.mininetflix.ministreaming.application.content.port.VideoCatalogRepository;
 import com.mininetflix.ministreaming.application.playback.dto.StartPlaybackOutput;
 import com.mininetflix.ministreaming.application.playback.port.PlaybackRepository;
 import com.mininetflix.ministreaming.application.playback.port.VideoStorageService;
+import com.mininetflix.ministreaming.domain.content.VideoContent;
+import com.mininetflix.ministreaming.domain.playback.PlaybackState;
+import com.mininetflix.ministreaming.domain.playback.exception.VideoNotFoundException;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -10,24 +15,29 @@ public class StartPlaybackUseCaseImpl implements StartPlaybackUseCase {
 
     private final PlaybackRepository playbackRepository;
     private final VideoStorageService videoStorageService;
+    private final VideoCatalogRepository videoCatalogRepository;
 
     public StartPlaybackUseCaseImpl(
             PlaybackRepository playbackRepository,
-            VideoStorageService videoStorageService) {
+            VideoStorageService videoStorageService,
+            VideoCatalogRepository videoCatalogRepository) {
         this.playbackRepository = playbackRepository;
         this.videoStorageService = videoStorageService;
+        this.videoCatalogRepository = videoCatalogRepository;
     }
 
     @Override
     public StartPlaybackOutput execute(String userId, String contentId) {
 
-        String videoPath = "videoplayback.mp4"; // fake por enquanto
+        var content = videoCatalogRepository.findById(contentId)
+                .orElseThrow(() -> new VideoNotFoundException(contentId));
 
-        String videoUrl = videoStorageService.generatePresignedUrl(videoPath);
+        String videoUrl = videoStorageService
+                .generatePresignedUrl(content.getObjectPath());
 
         double startAt = playbackRepository
                 .findByUserAndContent(userId, contentId)
-                .map(p -> p.getCurrentTime())
+                .map(PlaybackState::getCurrentTime)
                 .orElse(0.0);
 
         return new StartPlaybackOutput(videoUrl, startAt);

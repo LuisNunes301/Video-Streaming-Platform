@@ -19,9 +19,7 @@ public class GetPlaybackProgressUseCaseImpl
     }
 
     @Override
-    public Optional<PlaybackState> execute(
-            String userId,
-            String contentId) {
+    public Optional<PlaybackState> execute(String userId, String contentId) {
         return playbackRepository.findByUserAndContent(userId, contentId);
     }
 }
