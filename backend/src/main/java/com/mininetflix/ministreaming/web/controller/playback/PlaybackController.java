@@ -1,52 +1,44 @@
 package com.mininetflix.ministreaming.web.controller.playback;
 
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mininetflix.ministreaming.application.playback.usecase.GetContinueWatchingUseCase;
+import com.mininetflix.ministreaming.application.playback.usecase.GetPlaybackProgressUseCase;
 import com.mininetflix.ministreaming.application.playback.usecase.SavePlaybackProgressUseCase;
 import com.mininetflix.ministreaming.application.playback.usecase.StartPlaybackUseCase;
 
 import com.mininetflix.ministreaming.domain.playback.PlaybackState;
 import com.mininetflix.ministreaming.web.controller.playback.dto.PlaybackProgressRequest;
 
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/playback")
-// @CrossOrigin(origins = "http://localhost:3001", allowedHeaders = "*", methods
-// = {
-// RequestMethod.GET,
-// RequestMethod.POST,
-// RequestMethod.PUT,
-// RequestMethod.DELETE,
-// RequestMethod.OPTIONS
-// })
+@RequiredArgsConstructor
 public class PlaybackController {
 
         private final StartPlaybackUseCase startPlaybackUseCase;
         private final SavePlaybackProgressUseCase savePlaybackProgressUseCase;
+        private final GetPlaybackProgressUseCase getPlaybackProgressUseCase;
+        private final GetContinueWatchingUseCase getContinueWatchingUseCase;
 
-        public PlaybackController(
-                        StartPlaybackUseCase startPlaybackUseCase,
-                        SavePlaybackProgressUseCase savePlaybackProgressUseCase) {
-                this.startPlaybackUseCase = startPlaybackUseCase;
-                this.savePlaybackProgressUseCase = savePlaybackProgressUseCase;
-        }
-
+        // 🎬 Start playback
         @PostMapping("/start/{contentId}")
-        public ResponseEntity<?> start(
+        public ResponseEntity<Map<String, Object>> start(
+                        @AuthenticationPrincipal(expression = "id") String userId,
                         @PathVariable String contentId) {
-                String userId = (String) SecurityContextHolder
-                                .getContext()
-                                .getAuthentication()
-                                .getPrincipal();
 
                 var output = startPlaybackUseCase.execute(userId, contentId);
 
@@ -56,20 +48,43 @@ public class PlaybackController {
                                                 "startAt", output.startAt()));
         }
 
+        // ⏱ Save progress
         @PostMapping("/progress")
         public ResponseEntity<Void> progress(
+                        @AuthenticationPrincipal(expression = "id") String userId,
                         @RequestBody PlaybackProgressRequest request) {
-                String userId = "1";
 
-                PlaybackState state = new PlaybackState(
+                PlaybackState input = new PlaybackState(
                                 userId,
                                 request.getContentId(),
-                                request.getCurrentTime(),
-                                0.0,
-                                false);
+                                0);
 
-                savePlaybackProgressUseCase.execute(state);
+                input.updateProgress(
+                                request.getCurrentTime(),
+                                0);
+
+                savePlaybackProgressUseCase.execute(input);
 
                 return ResponseEntity.ok().build();
+        }
+
+        @GetMapping("/continue")
+        public ResponseEntity<List<PlaybackState>> continueWatching(
+                        @AuthenticationPrincipal(expression = "id") String userId) {
+
+                List<PlaybackState> result = getContinueWatchingUseCase.execute(userId);
+
+                return ResponseEntity.ok(result);
+        }
+
+        @GetMapping("/{contentId}")
+        public ResponseEntity<PlaybackState> getProgress(
+                        @AuthenticationPrincipal(expression = "id") String userId,
+                        @PathVariable String contentId) {
+
+                return getPlaybackProgressUseCase
+                                .execute(userId, contentId)
+                                .map(ResponseEntity::ok)
+                                .orElse(ResponseEntity.notFound().build());
         }
 }

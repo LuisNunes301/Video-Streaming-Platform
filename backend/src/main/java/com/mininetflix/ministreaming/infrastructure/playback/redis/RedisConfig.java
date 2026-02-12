@@ -13,15 +13,17 @@ import com.mininetflix.ministreaming.domain.playback.PlaybackState;
 public class RedisConfig {
 
     @Bean
-    public RedisTemplate<String, PlaybackState> playbackRedisTemplate(
+    public RedisTemplate<String, PlaybackState> redisTemplate(
             RedisConnectionFactory connectionFactory) {
 
         RedisTemplate<String, PlaybackState> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
+
+        Jackson2JsonRedisSerializer<PlaybackState> serializer = new Jackson2JsonRedisSerializer<>(PlaybackState.class);
+
+        template.setValueSerializer(serializer);
         template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(PlaybackState.class));
-        template.setHashKeySerializer(new StringRedisSerializer());
-        template.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(PlaybackState.class));
+
         template.afterPropertiesSet();
         return template;
     }

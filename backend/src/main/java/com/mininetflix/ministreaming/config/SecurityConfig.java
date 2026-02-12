@@ -34,6 +34,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/register", "/auth/login").permitAll()
+                        .requestMatchers("/videos").authenticated()
                         .requestMatchers("/playback/**").authenticated()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter,

@@ -4,6 +4,15 @@ public class PlaybackProgressRequest {
 
     private String contentId;
     private Double currentTime;
+    private Double duration;
+
+    public void setDuration(Double duration) {
+        this.duration = duration;
+    }
+
+    public Double getDuration() {
+        return duration;
+    }
 
     public String getContentId() {
         return contentId;

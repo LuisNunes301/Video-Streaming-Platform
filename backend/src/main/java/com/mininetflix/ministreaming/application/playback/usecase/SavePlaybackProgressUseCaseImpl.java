@@ -22,20 +22,25 @@ public class SavePlaybackProgressUseCaseImpl
     }
 
     @Override
-    public void execute(String userId, String contentId, double currentTime) {
+    public void execute(PlaybackState input) {
 
-        var content = videoCatalogRepository.findById(contentId)
-                .orElseThrow(() -> new VideoNotFoundException(contentId));
+        var video = videoCatalogRepository
+                .findById(input.getContentId())
+                .orElseThrow(() -> new IllegalArgumentException("Video not found"));
 
-        PlaybackState playback = playbackRepository
-                .findByUserAndContent(userId, contentId)
-                .orElse(new PlaybackState(
-                        userId,
-                        contentId,
-                        content.getDuration()));
+        double officialDuration = video.getDuration();
 
-        playback.updateProgress(currentTime);
+        PlaybackState state = playbackRepository
+                .findByUserAndContent(input.getUserId(), input.getContentId())
+                .orElseGet(() -> new PlaybackState(
+                        input.getUserId(),
+                        input.getContentId(),
+                        officialDuration));
 
-        playbackRepository.save(playback);
+        state.updateProgress(
+                input.getCurrentTime(),
+                officialDuration);
+
+        playbackRepository.save(state);
     }
 }

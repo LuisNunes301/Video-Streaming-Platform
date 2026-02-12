@@ -1,56 +1,47 @@
 package com.mininetflix.ministreaming.domain.playback;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import java.time.Instant;
+
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Data
-@AllArgsConstructor
+@Getter
+@NoArgsConstructor
 public class PlaybackState {
 
-    private final String userId;
-    private final String contentId;
+    private String userId;
+    private String contentId;
+
     private double currentTime;
-    private final double duration;
+    private double duration;
+
     private boolean completed;
+
+    private Instant lastUpdated;
 
     public PlaybackState(String userId, String contentId, double duration) {
         this.userId = userId;
         this.contentId = contentId;
         this.duration = duration;
-        this.currentTime = 0;
+        this.currentTime = 0.0;
         this.completed = false;
+        this.lastUpdated = Instant.now();
     }
 
-    public void updateProgress(double newTime) {
+    public void updateProgress(double newTime, double duration) {
+
         if (newTime < 0) {
             throw new IllegalArgumentException("Progress cannot be negative");
         }
 
+        this.duration = duration;
+
         this.currentTime = Math.min(newTime, duration);
 
-        if (this.currentTime >= duration) {
-            this.completed = true;
-        }
-    }
+        // Netflix-style: 95% = completo
+        this.completed = duration > 0 &&
+                this.currentTime >= (duration * 0.95);
 
-    public boolean isCompleted() {
-        return completed;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public String getContentId() {
-        return contentId;
-    }
-
-    public double getCurrentTime() {
-        return currentTime;
-    }
-
-    public double getDuration() {
-        return duration;
+        this.lastUpdated = Instant.now();
     }
 }
