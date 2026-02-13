@@ -38,7 +38,6 @@ public class AuthController {
 
         @PostMapping("/register")
         public ResponseEntity<Map<String, String>> register(@RequestBody RegisterRequest request) {
-                System.out.println(">>> REGISTER FOI CHAMADO <<<");
 
                 RegisterUserInput input = new RegisterUserInput(
                                 request.name(),

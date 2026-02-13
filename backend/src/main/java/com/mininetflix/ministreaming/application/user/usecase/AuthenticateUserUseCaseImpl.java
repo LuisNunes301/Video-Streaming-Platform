@@ -37,7 +37,9 @@ public class AuthenticateUserUseCaseImpl implements AuthenticateUserUseCase {
         }
 
         // Gera o token JWT
-        String token = tokenService.generateToken(user.getId().toString());
+        String token = tokenService.generateToken(
+                user.getId().toString(),
+                user.getRoles());
 
         return new AuthenticateUserOutput(token);
     }

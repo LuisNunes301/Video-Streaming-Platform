@@ -32,21 +32,19 @@ public class SecurityConfig {
         JwtAuthenticationFilter jwtFilter = new JwtAuthenticationFilter(tokenService);
 
         return http
-                .cors(Customizer.withDefaults())
+                .cors(cors -> {
+                })
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/register", "/auth/login").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/videos/upload").hasRole("ADMIN")
-                        .requestMatchers("/videos").authenticated()
                         .requestMatchers("/playback/**").authenticated()
                         .anyRequest().authenticated())
-                .addFilterBefore(jwtFilter,
-                        UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
-    // Configuração global de CORS
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();

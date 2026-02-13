@@ -2,8 +2,14 @@ package com.mininetflix.ministreaming.infrastructure.user.security;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.mininetflix.ministreaming.application.user.port.TokenService;
+import com.mininetflix.ministreaming.domain.user.UserRole;
+
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -17,12 +23,16 @@ public class JwtTokenService implements TokenService {
     }
 
     @Override
-    public String generateToken(String userId) {
+    public String generateToken(String userId, Set<UserRole> roles) {
+
         Date now = new Date();
         Date expiration = new Date(now.getTime() + properties.getExpiration());
 
         return Jwts.builder()
                 .setSubject(userId)
+                .claim("roles", roles.stream()
+                        .map(Enum::name)
+                        .toList())
                 .setIssuedAt(now)
                 .setExpiration(expiration)
                 .signWith(
@@ -53,4 +63,27 @@ public class JwtTokenService implements TokenService {
                 .getBody()
                 .getSubject();
     }
+
+    @Override
+    public List<String> getRoles(String token) {
+
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(
+                        Keys.hmacShaKeyFor(
+                                properties.getSecret().getBytes(StandardCharsets.UTF_8)))
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        Object rolesClaim = claims.get("roles");
+
+        if (rolesClaim instanceof List<?> rolesList) {
+            return rolesList.stream()
+                    .map(Object::toString)
+                    .toList();
+        }
+
+        return List.of();
+    }
+
 }

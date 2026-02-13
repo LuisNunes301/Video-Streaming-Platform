@@ -40,12 +40,9 @@ public class RegisterUserUseCaseImpl
         }
 
         User user = new User(
-                null,
                 input.name(),
                 input.email(),
-                passwordEncoder.encode(input.password()),
-                LocalDateTime.now(),
-                LocalDateTime.now());
+                passwordEncoder.encode(input.password()));
 
         userRepository.save(user);
     }

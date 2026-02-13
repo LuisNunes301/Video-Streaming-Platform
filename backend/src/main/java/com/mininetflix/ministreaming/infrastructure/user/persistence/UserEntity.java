@@ -1,54 +1,72 @@
 package com.mininetflix.ministreaming.infrastructure.user.persistence;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import com.mininetflix.ministreaming.domain.user.User;
+import com.mininetflix.ministreaming.domain.user.UserRole;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Version;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.JoinColumn;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Table(name = "users")
 public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, length = 150)
     private String email;
 
-    @Column(nullable = false)
-    private String PasswordHash;
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
 
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private Set<UserRole> roles = new HashSet<>();
+
     public static UserEntity fromDomain(User user) {
-        UserEntity e = new UserEntity();
-        e.name = user.getName();
-        e.email = user.getEmail();
-        e.PasswordHash = user.getPasswordHash();
-        e.createdAt = user.getCreateAt();
-        e.updatedAt = user.getUpdateAt();
-        return e;
+        UserEntity entity = new UserEntity();
+        entity.id = user.getId();
+        entity.name = user.getName();
+        entity.email = user.getEmail();
+        entity.passwordHash = user.getPasswordHash();
+        entity.createdAt = user.getCreatedAt();
+        entity.updatedAt = user.getUpdatedAt();
+        entity.roles = new HashSet<>(user.getRoles());
+        return entity;
     }
 
     public User toDomain() {
@@ -56,8 +74,9 @@ public class UserEntity {
                 this.id,
                 this.name,
                 this.email,
-                this.PasswordHash,
+                this.passwordHash,
                 this.createdAt,
-                this.updatedAt);
+                this.updatedAt,
+                this.roles);
     }
 }
