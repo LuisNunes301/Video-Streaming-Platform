@@ -13,18 +13,33 @@ public class VideoContentEntity {
 
     private String title;
 
-    private String objectPath;
+    private String bucket;
+
+    public String getBucket() {
+        return bucket;
+    }
+
+    public void setBucket(String bucket) {
+        this.bucket = bucket;
+    }
+
+    private String objectKey;
 
     private double duration;
+
+    private boolean active = true;
 
     public VideoContentEntity() {
     }
 
-    public VideoContentEntity(String id, String title, String objectPath, double duration) {
+    public VideoContentEntity(String id, String title, String objectKey, double duration, String bucket,
+            boolean active) {
         this.id = id;
         this.title = title;
-        this.objectPath = objectPath;
+        this.objectKey = objectKey;
+        this.bucket = bucket;
         this.duration = duration;
+        this.active = active;
     }
 
     public String getId() {
@@ -43,12 +58,12 @@ public class VideoContentEntity {
         this.title = title;
     }
 
-    public String getObjectPath() {
-        return objectPath;
+    public String getObjectKey() {
+        return objectKey;
     }
 
-    public void setObjectPath(String objectPath) {
-        this.objectPath = objectPath;
+    public void setObjectKey(String objectKey) {
+        this.objectKey = objectKey;
     }
 
     public double getDuration() {
@@ -57,6 +72,14 @@ public class VideoContentEntity {
 
     public void setDuration(double duration) {
         this.duration = duration;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
 }

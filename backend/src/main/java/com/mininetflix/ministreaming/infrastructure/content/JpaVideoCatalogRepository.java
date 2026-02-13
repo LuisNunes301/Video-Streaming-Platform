@@ -21,13 +21,14 @@ public class JpaVideoCatalogRepository
 
         @Override
         public Optional<VideoContent> findById(String id) {
-
                 return jpaRepository.findById(id)
                                 .map(entity -> new VideoContent(
                                                 entity.getId(),
                                                 entity.getTitle(),
-                                                entity.getObjectPath(),
-                                                entity.getDuration()));
+                                                entity.getBucket(),
+                                                entity.getObjectKey(),
+                                                entity.getDuration(),
+                                                entity.isActive()));
         }
 
         @Override
@@ -37,8 +38,10 @@ public class JpaVideoCatalogRepository
                                 .map(entity -> new VideoContent(
                                                 entity.getId(),
                                                 entity.getTitle(),
-                                                entity.getObjectPath(),
-                                                entity.getDuration()))
+                                                entity.getBucket(),
+                                                entity.getObjectKey(),
+                                                entity.getDuration(),
+                                                entity.isActive()))
                                 .toList();
         }
 }

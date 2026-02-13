@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mininetflix.ministreaming.application.content.usecase.ListVideosUseCase;
 import com.mininetflix.ministreaming.domain.content.VideoContent;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 public class VideoController {

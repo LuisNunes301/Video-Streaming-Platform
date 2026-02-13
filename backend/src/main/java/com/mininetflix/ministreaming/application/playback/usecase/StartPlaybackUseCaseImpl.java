@@ -4,7 +4,6 @@ import com.mininetflix.ministreaming.application.content.port.VideoCatalogReposi
 import com.mininetflix.ministreaming.application.playback.dto.StartPlaybackOutput;
 import com.mininetflix.ministreaming.application.playback.port.PlaybackRepository;
 import com.mininetflix.ministreaming.application.playback.port.VideoStorageService;
-import com.mininetflix.ministreaming.domain.content.VideoContent;
 import com.mininetflix.ministreaming.domain.playback.PlaybackState;
 import com.mininetflix.ministreaming.domain.playback.exception.VideoNotFoundException;
 
@@ -13,33 +12,39 @@ import org.springframework.stereotype.Service;
 @Service
 public class StartPlaybackUseCaseImpl implements StartPlaybackUseCase {
 
-    private final PlaybackRepository playbackRepository;
-    private final VideoStorageService videoStorageService;
-    private final VideoCatalogRepository videoCatalogRepository;
+        private final PlaybackRepository playbackRepository;
+        private final VideoStorageService videoStorageService;
+        private final VideoCatalogRepository videoCatalogRepository;
 
-    public StartPlaybackUseCaseImpl(
-            PlaybackRepository playbackRepository,
-            VideoStorageService videoStorageService,
-            VideoCatalogRepository videoCatalogRepository) {
-        this.playbackRepository = playbackRepository;
-        this.videoStorageService = videoStorageService;
-        this.videoCatalogRepository = videoCatalogRepository;
-    }
+        public StartPlaybackUseCaseImpl(
+                        PlaybackRepository playbackRepository,
+                        VideoStorageService videoStorageService,
+                        VideoCatalogRepository videoCatalogRepository) {
+                this.playbackRepository = playbackRepository;
+                this.videoStorageService = videoStorageService;
+                this.videoCatalogRepository = videoCatalogRepository;
+        }
 
-    @Override
-    public StartPlaybackOutput execute(String userId, String contentId) {
+        @Override
+        public StartPlaybackOutput execute(String userId, String contentId) {
 
-        var content = videoCatalogRepository.findById(contentId)
-                .orElseThrow(() -> new VideoNotFoundException(contentId));
+                var content = videoCatalogRepository.findById(contentId)
+                                .orElseThrow(() -> new VideoNotFoundException(contentId));
+                if (!content.isActive()) {
+                        throw new IllegalStateException("Video is not available");
+                }
 
-        String videoUrl = videoStorageService
-                .generatePresignedUrl(content.getObjectPath());
+                double startAt = playbackRepository
+                                .findByUserAndContent(userId, contentId)
+                                .filter(state -> !state.isCompleted())
+                                .map(PlaybackState::getCurrentTime)
+                                .orElse(0.0);
+                String videoUrl = videoStorageService
+                                .generatePresignedUrl(
+                                                content.getBucket(),
+                                                content.getObjectKey());
 
-        double startAt = playbackRepository
-                .findByUserAndContent(userId, contentId)
-                .map(PlaybackState::getCurrentTime)
-                .orElse(0.0);
+                return new StartPlaybackOutput(videoUrl, startAt);
 
-        return new StartPlaybackOutput(videoUrl, startAt);
-    }
+        }
 }

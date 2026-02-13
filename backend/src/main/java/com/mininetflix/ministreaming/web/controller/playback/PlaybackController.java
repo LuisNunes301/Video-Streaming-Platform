@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mininetflix.ministreaming.application.playback.dto.StartPlaybackOutput;
 import com.mininetflix.ministreaming.application.playback.usecase.GetContinueWatchingUseCase;
 import com.mininetflix.ministreaming.application.playback.usecase.GetPlaybackProgressUseCase;
 import com.mininetflix.ministreaming.application.playback.usecase.SavePlaybackProgressUseCase;
@@ -19,10 +20,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/playback")
@@ -34,53 +34,52 @@ public class PlaybackController {
         private final GetPlaybackProgressUseCase getPlaybackProgressUseCase;
         private final GetContinueWatchingUseCase getContinueWatchingUseCase;
 
-        // 🎬 Start playback
-        @PostMapping("/start/{contentId}")
-        public ResponseEntity<Map<String, Object>> start(
-                        @AuthenticationPrincipal(expression = "id") String userId,
+        // 🎬 Start playback (GET)
+        @GetMapping("/start/{contentId}")
+        public ResponseEntity<StartPlaybackOutput> start(
+                        Authentication authentication,
                         @PathVariable String contentId) {
 
-                var output = startPlaybackUseCase.execute(userId, contentId);
+                String userId = authentication.getName();
 
                 return ResponseEntity.ok(
-                                Map.of(
-                                                "videoUrl", output.videoUrl(),
-                                                "startAt", output.startAt()));
+                                startPlaybackUseCase.execute(userId, contentId));
         }
 
         // ⏱ Save progress
         @PostMapping("/progress")
         public ResponseEntity<Void> progress(
-                        @AuthenticationPrincipal(expression = "id") String userId,
+                        Authentication authentication,
                         @RequestBody PlaybackProgressRequest request) {
 
-                PlaybackState input = new PlaybackState(
+                String userId = authentication.getName();
+
+                savePlaybackProgressUseCase.execute(
                                 userId,
                                 request.getContentId(),
-                                0);
-
-                input.updateProgress(
-                                request.getCurrentTime(),
-                                0);
-
-                savePlaybackProgressUseCase.execute(input);
+                                request.getCurrentTime());
 
                 return ResponseEntity.ok().build();
         }
 
+        // ▶ Continue Watching
         @GetMapping("/continue")
         public ResponseEntity<List<PlaybackState>> continueWatching(
-                        @AuthenticationPrincipal(expression = "id") String userId) {
+                        Authentication authentication) {
 
-                List<PlaybackState> result = getContinueWatchingUseCase.execute(userId);
+                String userId = authentication.getName();
 
-                return ResponseEntity.ok(result);
+                return ResponseEntity.ok(
+                                getContinueWatchingUseCase.execute(userId));
         }
 
+        // 🔎 Get progress of specific content
         @GetMapping("/{contentId}")
         public ResponseEntity<PlaybackState> getProgress(
-                        @AuthenticationPrincipal(expression = "id") String userId,
+                        Authentication authentication,
                         @PathVariable String contentId) {
+
+                String userId = authentication.getName();
 
                 return getPlaybackProgressUseCase
                                 .execute(userId, contentId)

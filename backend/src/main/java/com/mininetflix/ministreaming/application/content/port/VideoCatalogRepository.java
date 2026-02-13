@@ -9,4 +9,6 @@ public interface VideoCatalogRepository {
     Optional<VideoContent> findById(String id);
 
     List<VideoContent> findAll();
+
+    void save(VideoContent video);
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -17,6 +18,8 @@ import com.mininetflix.ministreaming.application.user.port.TokenService;
 import com.mininetflix.ministreaming.infrastructure.user.security.JwtAuthenticationFilter;
 
 @Configuration
+@EnableMethodSecurity
+
 public class SecurityConfig {
     private final TokenService tokenService;
 
@@ -34,6 +37,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/register", "/auth/login").permitAll()
+                        .requestMatchers("/videos/upload").hasRole("ADMIN")
                         .requestMatchers("/videos").authenticated()
                         .requestMatchers("/playback/**").authenticated()
                         .anyRequest().authenticated())
