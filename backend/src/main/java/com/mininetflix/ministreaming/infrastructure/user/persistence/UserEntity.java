@@ -53,13 +53,13 @@ public class UserEntity {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
     private Set<UserRole> roles = new HashSet<>();
 
     public static UserEntity fromDomain(User user) {
         UserEntity entity = new UserEntity();
-        entity.id = user.getId();
+        entity.id = null;
         entity.name = user.getName();
         entity.email = user.getEmail();
         entity.passwordHash = user.getPasswordHash();

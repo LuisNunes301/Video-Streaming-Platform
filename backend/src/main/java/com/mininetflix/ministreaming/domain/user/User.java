@@ -16,7 +16,7 @@ public class User {
     private final Set<UserRole> roles;
 
     public User(String name, String email, String passwordHash) {
-        this.id = UUID.randomUUID();
+        this.id = null;
         this.name = name;
         this.email = email;
         this.passwordHash = passwordHash;
