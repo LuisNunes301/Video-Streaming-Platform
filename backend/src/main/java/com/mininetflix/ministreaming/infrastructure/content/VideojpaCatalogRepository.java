@@ -9,12 +9,12 @@ import com.mininetflix.ministreaming.application.content.port.VideoCatalogReposi
 import com.mininetflix.ministreaming.domain.content.VideoContent;
 
 @Component
-public class JpaVideoCatalogRepository
+public class VideojpaCatalogRepository
                 implements VideoCatalogRepository {
 
         private final DataVideoJpaRepository jpaRepository;
 
-        public JpaVideoCatalogRepository(
+        public VideojpaCatalogRepository(
                         DataVideoJpaRepository jpaRepository) {
                 this.jpaRepository = jpaRepository;
         }
@@ -43,5 +43,27 @@ public class JpaVideoCatalogRepository
                                                 entity.getDuration(),
                                                 entity.isActive()))
                                 .toList();
+        }
+
+        @Override
+        public VideoContent save(VideoContent video) {
+
+                VideoContentEntity entity = new VideoContentEntity(
+                                video.getId(),
+                                video.getTitle(),
+                                video.getObjectKey(),
+                                video.getDuration(),
+                                video.getBucket(),
+                                video.isActive());
+
+                VideoContentEntity saved = jpaRepository.save(entity);
+
+                return new VideoContent(
+                                saved.getId(),
+                                saved.getTitle(),
+                                saved.getBucket(),
+                                saved.getObjectKey(),
+                                saved.getDuration(),
+                                saved.isActive());
         }
 }

@@ -1,11 +1,9 @@
 package com.mininetflix.ministreaming.web.controller.content;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +19,7 @@ import com.mininetflix.ministreaming.domain.content.UploadVideoOutput;
 import com.mininetflix.ministreaming.domain.content.VideoContent;
 
 @RestController
-@RequestMapping("/admin/videos")
+@RequestMapping("/videos")
 public class VideoUploadController {
 
     private final UploadVideoUseCase uploadVideoUseCase;
@@ -35,9 +33,7 @@ public class VideoUploadController {
         this.catalogRepository = catalogRepository;
     }
 
-    // 🔥 Upload - SOMENTE ADMIN
-    @PostMapping("/upload")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping(value = "/upload", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<UploadVideoOutput> upload(
             @RequestParam String title,
             @RequestParam String bucket,

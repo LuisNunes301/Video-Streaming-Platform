@@ -10,5 +10,5 @@ public interface VideoCatalogRepository {
 
     List<VideoContent> findAll();
 
-    void save(VideoContent video);
+    VideoContent save(VideoContent video);
 }
