@@ -9,7 +9,7 @@ import io.minio.http.Method;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.mininetflix.ministreaming.application.playback.port.VideoStorageService;
+import com.mininetflix.ministreaming.application.content.port.VideoStorageService;
 
 import java.util.concurrent.TimeUnit;
 

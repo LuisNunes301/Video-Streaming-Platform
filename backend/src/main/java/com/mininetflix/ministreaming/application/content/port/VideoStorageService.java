@@ -1,4 +1,4 @@
-package com.mininetflix.ministreaming.application.playback.port;
+package com.mininetflix.ministreaming.application.content.port;
 
 import org.springframework.web.multipart.MultipartFile;
 

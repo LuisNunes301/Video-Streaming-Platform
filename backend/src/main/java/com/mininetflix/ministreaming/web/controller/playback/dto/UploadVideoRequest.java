@@ -1,8 +1,8 @@
-package com.mininetflix.ministreaming.application.content.dto;
+package com.mininetflix.ministreaming.web.controller.playback.dto;
 
 public class UploadVideoRequest {
     private String title;
-    private Double duration;
+
     private String bucket;
 
     public String getTitle() {
@@ -11,14 +11,6 @@ public class UploadVideoRequest {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public Double getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Double duration) {
-        this.duration = duration;
     }
 
     public String getBucket() {

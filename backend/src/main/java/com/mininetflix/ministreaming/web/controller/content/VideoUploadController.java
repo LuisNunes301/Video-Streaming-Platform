@@ -11,11 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mininetflix.ministreaming.application.content.dto.UploadVideoOutput;
 import com.mininetflix.ministreaming.application.content.port.VideoCatalogRepository;
 import com.mininetflix.ministreaming.application.content.usecase.UploadVideoUseCase;
 
-import com.mininetflix.ministreaming.domain.content.UploadVideoInput;
-import com.mininetflix.ministreaming.domain.content.UploadVideoOutput;
 import com.mininetflix.ministreaming.domain.content.VideoContent;
 
 @RestController
@@ -40,15 +39,9 @@ public class VideoUploadController {
             @RequestParam double duration,
             @RequestParam MultipartFile file) {
 
-        UploadVideoInput input = new UploadVideoInput(
-                title,
-                bucket,
-                duration,
-                file);
-
         return ResponseEntity.ok(
-                uploadVideoUseCase.execute(input));
-    }
+                uploadVideoUseCase.execute(title, bucket, file));
+    };
 
     // 🔥 Listar catálogo
     @GetMapping

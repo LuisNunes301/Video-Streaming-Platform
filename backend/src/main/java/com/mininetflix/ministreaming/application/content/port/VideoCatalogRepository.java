@@ -6,9 +6,9 @@ import java.util.Optional;
 import com.mininetflix.ministreaming.domain.content.VideoContent;
 
 public interface VideoCatalogRepository {
+    void save(VideoContent video);
+
     Optional<VideoContent> findById(String id);
 
     List<VideoContent> findAll();
-
-    VideoContent save(VideoContent video);
 }

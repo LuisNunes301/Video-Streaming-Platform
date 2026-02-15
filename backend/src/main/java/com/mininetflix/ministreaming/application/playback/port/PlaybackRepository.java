@@ -7,9 +7,11 @@ import com.mininetflix.ministreaming.domain.playback.PlaybackState;
 
 public interface PlaybackRepository {
 
-    Optional<PlaybackState> findByUserAndContent(String userId, String contentId);
+    Optional<PlaybackState> findByUserAndContent(
+            String userId,
+            String contentId);
 
     void save(PlaybackState state);
 
-    List<PlaybackState> findByUser(String userId);
+    List<PlaybackState> findByUserAndNotCompleted(String userId);
 }

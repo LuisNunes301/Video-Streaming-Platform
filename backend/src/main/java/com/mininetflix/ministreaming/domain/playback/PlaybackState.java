@@ -4,8 +4,10 @@ import java.time.Instant;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class PlaybackState {
 
@@ -13,34 +15,28 @@ public class PlaybackState {
     private String contentId;
 
     private double currentTime;
-    private double duration;
-
     private boolean completed;
 
     private Instant lastUpdated;
 
-    public PlaybackState(String userId, String contentId, double duration) {
+    public PlaybackState(String userId, String contentId) {
         this.userId = userId;
         this.contentId = contentId;
-        this.duration = duration;
         this.currentTime = 0.0;
         this.completed = false;
         this.lastUpdated = Instant.now();
     }
 
-    public void updateProgress(double newTime, double duration) {
+    public void updateProgress(double newTime, double officialDuration) {
 
         if (newTime < 0) {
             throw new IllegalArgumentException("Progress cannot be negative");
         }
 
-        this.duration = duration;
+        this.currentTime = Math.min(newTime, officialDuration);
 
-        this.currentTime = Math.min(newTime, duration);
-
-        // Netflix-style: 95% = completo
-        this.completed = duration > 0 &&
-                this.currentTime >= (duration * 0.95);
+        this.completed = officialDuration > 0 &&
+                this.currentTime >= officialDuration * 0.95;
 
         this.lastUpdated = Instant.now();
     }

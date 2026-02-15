@@ -1,8 +1,12 @@
 package com.mininetflix.ministreaming.application.content.usecase;
 
-import com.mininetflix.ministreaming.domain.content.UploadVideoInput;
-import com.mininetflix.ministreaming.domain.content.UploadVideoOutput;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.mininetflix.ministreaming.application.content.dto.UploadVideoOutput;
 
 public interface UploadVideoUseCase {
-    UploadVideoOutput execute(UploadVideoInput input);
+    UploadVideoOutput execute(
+            String title,
+            String bucket,
+            MultipartFile file);
 }

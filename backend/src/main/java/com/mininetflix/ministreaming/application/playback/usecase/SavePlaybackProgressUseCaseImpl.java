@@ -3,6 +3,7 @@ package com.mininetflix.ministreaming.application.playback.usecase;
 import org.springframework.stereotype.Service;
 
 import com.mininetflix.ministreaming.application.content.port.VideoCatalogRepository;
+import com.mininetflix.ministreaming.application.playback.dto.SavePlaybackProgressInput;
 import com.mininetflix.ministreaming.application.playback.port.PlaybackRepository;
 import com.mininetflix.ministreaming.domain.playback.PlaybackState;
 
@@ -21,25 +22,25 @@ public class SavePlaybackProgressUseCaseImpl
         }
 
         @Override
-        public void execute(PlaybackState input) {
+        public void execute(SavePlaybackProgressInput input) {
 
                 var video = videoCatalogRepository
-                                .findById(input.getContentId())
+                                .findById(input.contentId())
                                 .orElseThrow(() -> new IllegalArgumentException("Video not found"));
 
                 double officialDuration = video.getDuration();
 
                 PlaybackState state = playbackRepository
-                                .findByUserAndContent(input.getUserId(), input.getContentId())
+                                .findByUserAndContent(input.userId(), input.contentId())
                                 .orElseGet(() -> new PlaybackState(
-                                                input.getUserId(),
-                                                input.getContentId(),
-                                                officialDuration));
+                                                input.userId(),
+                                                input.contentId()));
 
                 state.updateProgress(
-                                input.getCurrentTime(),
+                                input.currentTime(),
                                 officialDuration);
 
                 playbackRepository.save(state);
         }
+
 }

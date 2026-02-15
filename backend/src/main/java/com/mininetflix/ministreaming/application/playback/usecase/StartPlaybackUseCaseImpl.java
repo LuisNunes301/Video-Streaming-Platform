@@ -1,9 +1,9 @@
 package com.mininetflix.ministreaming.application.playback.usecase;
 
 import com.mininetflix.ministreaming.application.content.port.VideoCatalogRepository;
+import com.mininetflix.ministreaming.application.content.port.VideoStorageService;
 import com.mininetflix.ministreaming.application.playback.dto.StartPlaybackOutput;
 import com.mininetflix.ministreaming.application.playback.port.PlaybackRepository;
-import com.mininetflix.ministreaming.application.playback.port.VideoStorageService;
 import com.mininetflix.ministreaming.domain.playback.PlaybackState;
 import com.mininetflix.ministreaming.domain.playback.exception.VideoNotFoundException;
 

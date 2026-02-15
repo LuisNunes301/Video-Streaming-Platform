@@ -1,4 +1,4 @@
-package com.mininetflix.ministreaming.infrastructure.content;
+package com.mininetflix.ministreaming.infrastructure.content.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -12,32 +12,26 @@ public class VideoContentEntity {
     private String id;
 
     private String title;
-
     private String bucket;
-
-    public String getBucket() {
-        return bucket;
-    }
-
-    public void setBucket(String bucket) {
-        this.bucket = bucket;
-    }
-
     private String objectKey;
-
     private double duration;
-
-    private boolean active = true;
+    private boolean active;
 
     public VideoContentEntity() {
     }
 
-    public VideoContentEntity(String id, String title, String objectKey, double duration, String bucket,
+    public VideoContentEntity(
+            String id,
+            String title,
+            String bucket,
+            String objectKey,
+            double duration,
             boolean active) {
+
         this.id = id;
         this.title = title;
-        this.objectKey = objectKey;
         this.bucket = bucket;
+        this.objectKey = objectKey;
         this.duration = duration;
         this.active = active;
     }
@@ -56,6 +50,14 @@ public class VideoContentEntity {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getBucket() {
+        return bucket;
+    }
+
+    public void setBucket(String bucket) {
+        this.bucket = bucket;
     }
 
     public String getObjectKey() {

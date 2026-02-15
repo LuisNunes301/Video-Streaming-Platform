@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mininetflix.ministreaming.application.playback.dto.SavePlaybackProgressInput;
 import com.mininetflix.ministreaming.application.playback.dto.StartPlaybackOutput;
 import com.mininetflix.ministreaming.application.playback.usecase.GetContinueWatchingUseCase;
 import com.mininetflix.ministreaming.application.playback.usecase.GetPlaybackProgressUseCase;
@@ -34,7 +35,6 @@ public class PlaybackController {
         private final GetPlaybackProgressUseCase getPlaybackProgressUseCase;
         private final GetContinueWatchingUseCase getContinueWatchingUseCase;
 
-        // 🎬 Start playback (GET)
         @GetMapping("/start/{contentId}")
         public ResponseEntity<StartPlaybackOutput> start(
                         Authentication authentication,
@@ -46,7 +46,6 @@ public class PlaybackController {
                                 startPlaybackUseCase.execute(userId, contentId));
         }
 
-        // ⏱ Save progress
         @PostMapping("/progress")
         public ResponseEntity<Void> progress(
                         Authentication authentication,
@@ -54,15 +53,16 @@ public class PlaybackController {
 
                 String userId = authentication.getName();
 
-                savePlaybackProgressUseCase.execute(
+                SavePlaybackProgressInput input = new SavePlaybackProgressInput(
                                 userId,
                                 request.getContentId(),
                                 request.getCurrentTime());
 
+                savePlaybackProgressUseCase.execute(input);
+
                 return ResponseEntity.ok().build();
         }
 
-        // ▶ Continue Watching
         @GetMapping("/continue")
         public ResponseEntity<List<PlaybackState>> continueWatching(
                         Authentication authentication) {
@@ -73,7 +73,6 @@ public class PlaybackController {
                                 getContinueWatchingUseCase.execute(userId));
         }
 
-        // 🔎 Get progress of specific content
         @GetMapping("/{contentId}")
         public ResponseEntity<PlaybackState> getProgress(
                         Authentication authentication,

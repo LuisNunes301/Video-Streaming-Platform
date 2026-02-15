@@ -19,12 +19,10 @@ public class GetContinueWatchingUseCaseImpl implements GetContinueWatchingUseCas
     @Override
     public List<PlaybackState> execute(String userId) {
 
-        return playbackRepository.findByUser(userId)
-                .stream()
-                .filter(state -> !state.isCompleted())
-                .sorted(Comparator
-                        .comparing(PlaybackState::getLastUpdated)
-                        .reversed())
+        return playbackRepository.findByUserAndNotCompleted(userId).stream()
+                .sorted(Comparator.comparing(PlaybackState::getLastUpdated,
+                        Comparator.nullsLast(Comparator.reverseOrder())))
+                .limit(10)
                 .toList();
     }
 }

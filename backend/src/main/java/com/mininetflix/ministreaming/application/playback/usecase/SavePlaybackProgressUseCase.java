@@ -1,5 +1,7 @@
 package com.mininetflix.ministreaming.application.playback.usecase;
 
+import com.mininetflix.ministreaming.application.playback.dto.SavePlaybackProgressInput;
+
 public interface SavePlaybackProgressUseCase {
-    void execute(String userId, String contentId, double currentTime);;
+    void execute(SavePlaybackProgressInput input);
 }
