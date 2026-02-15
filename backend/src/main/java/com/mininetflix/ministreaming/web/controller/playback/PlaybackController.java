@@ -35,6 +35,7 @@ public class PlaybackController {
         private final GetPlaybackProgressUseCase getPlaybackProgressUseCase;
         private final GetContinueWatchingUseCase getContinueWatchingUseCase;
 
+        // start playback about content id
         @GetMapping("/start/{contentId}")
         public ResponseEntity<StartPlaybackOutput> start(
                         Authentication authentication,
@@ -46,6 +47,7 @@ public class PlaybackController {
                                 startPlaybackUseCase.execute(userId, contentId));
         }
 
+        // post progress about content id
         @PostMapping("/progress")
         public ResponseEntity<Void> progress(
                         Authentication authentication,
@@ -63,6 +65,7 @@ public class PlaybackController {
                 return ResponseEntity.ok().build();
         }
 
+        // list of video incomplete
         @GetMapping("/continue")
         public ResponseEntity<List<PlaybackState>> continueWatching(
                         Authentication authentication) {
@@ -73,6 +76,7 @@ public class PlaybackController {
                                 getContinueWatchingUseCase.execute(userId));
         }
 
+        // return progress about content id
         @GetMapping("/{contentId}")
         public ResponseEntity<PlaybackState> getProgress(
                         Authentication authentication,

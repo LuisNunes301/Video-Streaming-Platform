@@ -31,13 +31,14 @@ public class UploadVideoUseCaseImpl implements UploadVideoUseCase {
                 }
 
                 String objectKey = UUID.randomUUID() + ".mp4";
-
+                String id = UUID.randomUUID().toString();
                 storageService.upload(bucket, objectKey, file);
 
                 // 🔥 por enquanto fixo (depois vamos automatizar metadata)
                 double duration = 120.0;
 
                 VideoContent video = VideoContent.create(
+                                id,
                                 title,
                                 bucket,
                                 objectKey,

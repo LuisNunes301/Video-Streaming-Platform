@@ -25,12 +25,13 @@ public class VideoContent {
     }
 
     public static VideoContent create(
+            String id,
             String title,
             String bucket,
             String objectKey,
             double duration) {
         return new VideoContent(
-                java.util.UUID.randomUUID().toString(),
+                id,
                 title,
                 bucket,
                 objectKey,

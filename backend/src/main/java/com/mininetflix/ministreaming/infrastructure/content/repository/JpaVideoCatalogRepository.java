@@ -36,6 +36,7 @@ public class JpaVideoCatalogRepository
         public Optional<VideoContent> findById(String id) {
                 return jpaRepository.findById(id)
                                 .map(entity -> VideoContent.create(
+                                                entity.getId(),
                                                 entity.getTitle(),
                                                 entity.getBucket(),
                                                 entity.getObjectKey(),
@@ -47,6 +48,7 @@ public class JpaVideoCatalogRepository
                 return jpaRepository.findAll()
                                 .stream()
                                 .map(entity -> VideoContent.create(
+                                                entity.getId(),
                                                 entity.getTitle(),
                                                 entity.getBucket(),
                                                 entity.getObjectKey(),
