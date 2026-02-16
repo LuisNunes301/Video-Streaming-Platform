@@ -34,7 +34,7 @@ public class AdminMockConfig {
 
             userRepository.save(admin);
 
-            System.out.println("🔥 ADMIN criado com sucesso!");
+            System.out.println("ADMIN criado com sucesso!");
         };
     }
 }

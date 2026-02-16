@@ -1,57 +1,71 @@
-version: '3.8'
+version: "3.9"
 
 services:
+  postgres:
+    image: postgres:16
+    container_name: mini_postgres
+    restart: always
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    container_name: mini_redis
+    restart: always
+    ports:
+      - "${REDIS_PORT}:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: mini_rabbit
+    restart: always
+    env_file:
+      - .env
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "${RABBITMQ_PORT}:5672"
+      - "${RABBITMQ_MANAGEMENT_PORT}:15672"
+
   minio:
     image: minio/minio
-    container_name: minio
-    ports:
-      - "9000:9000"
-      - "9001:9001"
+    container_name: mini_minio
+    restart: always
+    command: server /data --console-address ":${MINIO_CONSOLE_PORT}"
+    env_file:
+      - .env
     environment:
-      MINIO_ROOT_USER: admin
-      MINIO_ROOT_PASSWORD: admin123
-    volumes:
-      - minio-data:/data
-    command: server /data --console-address ":9001"
-
-  PostgreSQL:
-    image: postgres:15
-    container_name: postgres
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
     ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: ministreaming
+      - "${MINIO_PORT}:9000"
+      - "${MINIO_CONSOLE_PORT}:9001"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - minio_data:/data
 
-  Redis:
-    image: redis:latest
-    container_name: redis
+  app:
+    build: .
+    container_name: mini_app
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+      - minio
     ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
-    command: redis-server --appendonly yes
-  rabbitmq:
-      image: rabbitmq:3.13-management
-      container_name: ministreaming-rabbit
-      restart: always
+      - "${APP_PORT}:8080"
 
-
-      ports:
-        - "5672:5672"   
-        - "15672:15672"   
-
-      environment:
-        RABBITMQ_DEFAULT_USER: admin
-        RABBITMQ_DEFAULT_PASS: admin123
 volumes:
-  minio-data:
-  postgres-data:
-  redis-data:
-  rabbitmq_data:
-
-
-  
+  postgres_data:
+  minio_data:
