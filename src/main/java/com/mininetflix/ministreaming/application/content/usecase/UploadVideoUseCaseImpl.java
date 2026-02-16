@@ -5,11 +5,12 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mininetflix.ministreaming.application.content.dto.UploadVideoInput;
 import com.mininetflix.ministreaming.application.content.dto.UploadVideoOutput;
 import com.mininetflix.ministreaming.application.content.port.VideoCatalogRepository;
+import com.mininetflix.ministreaming.application.content.port.VideoMetadataExtractor;
 import com.mininetflix.ministreaming.application.content.port.VideoStorageService;
 import com.mininetflix.ministreaming.domain.content.VideoContent;
-import com.mininetflix.ministreaming.web.controller.playback.dto.UploadVideoRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,28 +20,26 @@ public class UploadVideoUseCaseImpl implements UploadVideoUseCase {
 
         private final VideoStorageService storageService;
         private final VideoCatalogRepository catalogRepository;
+        private final VideoMetadataExtractor metadataExtractor;
 
         @Override
         public UploadVideoOutput execute(
-                        String title,
-                        String bucket,
-                        MultipartFile file) {
+                        UploadVideoInput input) {
 
-                if (!"video/mp4".equals(file.getContentType())) {
+                if (!"video/mp4".equals(input.file().getContentType())) {
                         throw new IllegalArgumentException("Only MP4 files are allowed");
                 }
 
                 String objectKey = UUID.randomUUID() + ".mp4";
                 String id = UUID.randomUUID().toString();
-                storageService.upload(bucket, objectKey, file);
+                storageService.upload(input.bucket(), objectKey, input.file());
 
-                // 🔥 por enquanto fixo (depois vamos automatizar metadata)
-                double duration = 120.0;
+                double duration = metadataExtractor.extractDuration(input.file());
 
                 VideoContent video = VideoContent.create(
                                 id,
-                                title,
-                                bucket,
+                                input.title(),
+                                input.bucket(),
                                 objectKey,
                                 duration);
 
