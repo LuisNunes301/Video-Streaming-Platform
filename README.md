@@ -214,47 +214,60 @@ graph TB
 ```
 ### DIAGRAMA 5: VISÃO GERAL DO FLUXO (Resumo)
 ```mermaid
-graph LR
-    title["FLUXO COMPLETO DA APLICAÇÃO"]
-    style title fill:#fff,stroke:none,font-family:Arial,font-size:16px,font-weight:bold
+graph TB
+    title["PLATAFORMA DE VÍDEOS - ARQUITETURA EM DOCKER"]
+    style title fill:#fff,stroke:none,font-family:Arial,font-size:20px,font-weight:bold
 
-    User["USUÁRIO"]
+    User(("👤 USUÁRIO"))
     
-    subgraph Web["WEB"]
-        Controller["Controllers REST"]
+    subgraph Docker["DOCKER CONTAINERS"]
+        
+        App["APLICAÇÃO MONOLÍTICA<br/>Java + Spring Boot + FFmpeg<br/>Porta 8080"]
+        
+        DB["POSTGRESQL<br/>Banco de Dados<br/>Porta 5432"]
+        
+        Cache["REDIS<br/>Cache/Progresso<br/>Porta 6379"]
+        
+        Queue["RABBITMQ<br/>Filas<br/>Portas 5672,15672"]
+        
+        Storage["MINIO<br/>Armazenamento de Vídeos<br/>Portas 9000,9001"]
+        
+        %% Conexões principais
+        User <-->|HTTP/REST| App
+        App <-->|Dados| DB
+        App <-->|Cache| Cache
+        App <-->|Filas| Queue
+        App <-->|Arquivos| Storage
+        
+        %% Conexões internas
+        Queue -.->|Consumo| App
     end
     
-    subgraph App["APLICAÇÃO"]
-        UseCase["Casos de Uso"]
-        Ports["Ports"]
+    %% Legendas
+    subgraph Legenda["LEGENDA"]
+        L1[" Fluxo Síncrono (requisição/resposta)"]
+        L2["Fluxo Assíncrono (filas)"]
+        L3["Upload de vídeos usa RabbitMQ"]
+        L4["Reprodução acessa MinIO diretamente"]
     end
     
-    subgraph Domain["DOMÍNIO"]
-        Entities["Entidades"]
-        Rules["Regras"]
-    end
+    classDef user fill:#ffebee,stroke:#c62828,stroke-width:3px
+    classDef docker fill:#e1f5fe,stroke:#01579b,stroke-width:3px
+    classDef app fill:#e3f2fd,stroke:#1565c0,stroke-width:3px
+    classDef db fill:#e8f5e8,stroke:#2e7d32,stroke-width:3px
+    classDef cache fill:#fff9c4,stroke:#f57f17,stroke-width:3px
+    classDef queue fill:#ffcc80,stroke:#e65100,stroke-width:3px
+    classDef storage fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px
+    classDef legenda fill:#f5f5f5,stroke:#9e9e9e,stroke-width:1px,stroke-dasharray: 3 3
     
-    subgraph Infra["INFRAESTRUTURA"]
-        DB["PostgreSQL"]
-        Cache["Redis"]
-        Storage["MinIO"]
-        Queue["RabbitMQ"]
-    end
-
-    User --> Controller
-    Controller --> UseCase
-    UseCase --> Entities
-    UseCase --> Ports
-    Ports --> DB
-    Ports --> Cache
-    Ports --> Storage
-    Ports --> Queue
-    
-    style User fill:#ffebee,stroke:#c62828,stroke-width:2px
-    style Controller fill:#fff3e0,stroke:#e65100,stroke-width:2px
-    style UseCase,Ports fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
-    style Entities,Rules fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
-    style DB,Cache,Storage,Queue fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    class User user
+    class Docker docker
+    class App app
+    class DB db
+    class Cache cache
+    class Queue queue
+    class Storage storage
+    class L1,L2,L3,L4 legenda
 ```
 ------------------------------------------------------------------------
 
