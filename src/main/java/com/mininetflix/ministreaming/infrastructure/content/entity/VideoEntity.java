@@ -1,0 +1,48 @@
+package com.mininetflix.ministreaming.infrastructure.content.entity;
+
+import java.time.Instant;
+
+import com.mininetflix.ministreaming.domain.content.VideoStatus;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@Table(name = "videos")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Getter
+@Setter
+public class VideoEntity {
+
+    @Id
+    private String id;
+
+    private String title;
+    private String bucket;
+    private String objectKey;
+
+    @Enumerated(EnumType.STRING)
+    private VideoStatus status;
+
+    private Double duration;
+    private Long size;
+    private String resolution;
+
+    private String thumbnailUrl;
+    private String hlsPlaylistUrl;
+
+    private String processingError;
+
+    private Instant createdAt;
+    private Instant processedAt;
+}

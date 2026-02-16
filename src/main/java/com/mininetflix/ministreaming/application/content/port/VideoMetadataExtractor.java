@@ -1,7 +1,7 @@
 package com.mininetflix.ministreaming.application.content.port;
 
-import org.springframework.web.multipart.MultipartFile;
+import com.mininetflix.ministreaming.application.content.dto.VideoMetadata;
 
 public interface VideoMetadataExtractor {
-    double extractDuration(MultipartFile file);
+    VideoMetadata extract(String bucket, String objectKey);
 }

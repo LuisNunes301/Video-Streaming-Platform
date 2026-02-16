@@ -31,7 +31,7 @@ public class StartPlaybackUseCaseImpl implements StartPlaybackUseCase {
                 var content = videoCatalogRepository.findById(contentId)
                                 .orElseThrow(() -> new VideoNotFoundException(contentId));
                 if (!content.isActive()) {
-                        throw new IllegalStateException("Video is not available");
+                        throw new IllegalStateException("Video is not available for playback");
                 }
 
                 double startAt = playbackRepository
