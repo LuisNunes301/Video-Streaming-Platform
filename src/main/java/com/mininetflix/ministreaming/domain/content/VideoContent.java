@@ -1,42 +1,100 @@
 package com.mininetflix.ministreaming.domain.content;
 
+import java.time.Instant;
+
 public class VideoContent {
 
-    private final String id;
-    private final String title;
-    private final String bucket;
-    private final String objectKey;
-    private final double duration;
-    private final boolean active;
+    private String id;
+    private String title;
+    private String bucket;
+    private String objectKey;
 
-    public VideoContent(
-            String id,
-            String title,
-            String bucket,
-            String objectKey,
-            double duration,
-            boolean active) {
-        this.id = id;
-        this.title = title;
-        this.bucket = bucket;
-        this.objectKey = objectKey;
-        this.duration = duration;
-        this.active = active;
+    private VideoStatus status;
+
+    private Double duration;
+    private Long size;
+    private String resolution;
+
+    private String thumbnailUrl;
+    private String hlsPlaylistUrl;
+
+    private String processingError;
+
+    private Instant createdAt;
+    private Instant processedAt;
+
+    private VideoContent() {
     }
 
     public static VideoContent create(
             String id,
             String title,
             String bucket,
-            String objectKey,
-            double duration) {
-        return new VideoContent(
-                id,
-                title,
-                bucket,
-                objectKey,
-                duration,
-                true);
+            String objectKey) {
+
+        VideoContent video = new VideoContent();
+        video.id = id;
+        video.title = title;
+        video.bucket = bucket;
+        video.objectKey = objectKey;
+        video.status = VideoStatus.UPLOADING;
+        video.createdAt = Instant.now();
+
+        return video;
+    }
+
+    public void markProcessing() {
+        if (this.status != VideoStatus.UPLOADING) {
+            throw new IllegalStateException(
+                    "Video can only move to PROCESSING from UPLOADING");
+        }
+        this.status = VideoStatus.PROCESSING;
+    }
+
+    public void markReady(
+            Double duration,
+            Long size,
+            String resolution,
+            String thumbnailUrl,
+            String hlsPlaylistUrl) {
+
+        if (this.status != VideoStatus.PROCESSING) {
+            throw new IllegalStateException(
+                    "Video can only move to READY from PROCESSING");
+        }
+
+        this.duration = duration;
+        this.size = size;
+        this.resolution = resolution;
+        this.thumbnailUrl = thumbnailUrl;
+        this.hlsPlaylistUrl = hlsPlaylistUrl;
+        this.processingError = null;
+
+        this.status = VideoStatus.READY;
+        this.processedAt = Instant.now();
+    }
+
+    public void markFailed(String error) {
+        if (this.status != VideoStatus.PROCESSING) {
+            throw new IllegalStateException(
+                    "Video can only FAIL from PROCESSING");
+        }
+
+        this.status = VideoStatus.FAILED;
+        this.processingError = error;
+        this.processedAt = Instant.now();
+    }
+
+    public boolean isActive() {
+        return this.status == VideoStatus.READY;
+    }
+
+    public boolean isProcessing() {
+        return this.status == VideoStatus.PROCESSING;
+    }
+
+    public boolean isFailed() {
+        return this.status == VideoStatus.FAILED;
     }
 
     public String getId() {
@@ -55,11 +113,39 @@ public class VideoContent {
         return objectKey;
     }
 
-    public double getDuration() {
+    public VideoStatus getStatus() {
+        return status;
+    }
+
+    public Double getDuration() {
         return duration;
     }
 
-    public boolean isActive() {
-        return active;
+    public Long getSize() {
+        return size;
+    }
+
+    public String getResolution() {
+        return resolution;
+    }
+
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
+    }
+
+    public String getHlsPlaylistUrl() {
+        return hlsPlaylistUrl;
+    }
+
+    public String getProcessingError() {
+        return processingError;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getProcessedAt() {
+        return processedAt;
     }
 }

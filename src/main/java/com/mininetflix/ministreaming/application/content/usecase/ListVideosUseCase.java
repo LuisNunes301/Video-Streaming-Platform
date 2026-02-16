@@ -2,8 +2,8 @@ package com.mininetflix.ministreaming.application.content.usecase;
 
 import java.util.List;
 
-import com.mininetflix.ministreaming.domain.content.VideoContent;
+import com.mininetflix.ministreaming.application.content.dto.VideoResponse;
 
 public interface ListVideosUseCase {
-    List<VideoContent> execute();
+    List<VideoResponse> execute();
 }

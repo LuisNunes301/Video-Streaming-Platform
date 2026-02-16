@@ -7,27 +7,34 @@ import org.springframework.stereotype.Component;
 
 import com.mininetflix.ministreaming.application.content.port.VideoCatalogRepository;
 import com.mininetflix.ministreaming.domain.content.VideoContent;
-import com.mininetflix.ministreaming.infrastructure.content.entity.VideoContentEntity;
+import com.mininetflix.ministreaming.infrastructure.content.entity.VideoEntity;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class JpaVideoCatalogRepository
-                implements VideoCatalogRepository {
+public class JpaVideoCatalogRepository implements VideoCatalogRepository {
 
         private final DataVideoJpaRepository jpaRepository;
 
         @Override
         public void save(VideoContent video) {
 
-                VideoContentEntity entity = new VideoContentEntity(
-                                video.getId(),
-                                video.getTitle(),
-                                video.getBucket(),
-                                video.getObjectKey(),
-                                video.getDuration(),
-                                video.isActive());
+                VideoEntity entity = VideoEntity.builder()
+                                .id(video.getId())
+                                .title(video.getTitle())
+                                .bucket(video.getBucket())
+                                .objectKey(video.getObjectKey())
+                                .status(video.getStatus())
+                                .duration(video.getDuration())
+                                .size(video.getSize())
+                                .resolution(video.getResolution())
+                                .thumbnailUrl(video.getThumbnailUrl())
+                                .hlsPlaylistUrl(video.getHlsPlaylistUrl())
+                                .processingError(video.getProcessingError())
+                                .createdAt(video.getCreatedAt())
+                                .processedAt(video.getProcessedAt())
+                                .build();
 
                 jpaRepository.save(entity);
         }
@@ -35,24 +42,49 @@ public class JpaVideoCatalogRepository
         @Override
         public Optional<VideoContent> findById(String id) {
                 return jpaRepository.findById(id)
-                                .map(entity -> VideoContent.create(
-                                                entity.getId(),
-                                                entity.getTitle(),
-                                                entity.getBucket(),
-                                                entity.getObjectKey(),
-                                                entity.getDuration()));
+                                .map(this::toDomain);
         }
 
         @Override
         public List<VideoContent> findAll() {
                 return jpaRepository.findAll()
                                 .stream()
-                                .map(entity -> VideoContent.create(
-                                                entity.getId(),
-                                                entity.getTitle(),
-                                                entity.getBucket(),
-                                                entity.getObjectKey(),
-                                                entity.getDuration()))
+                                .map(this::toDomain)
                                 .toList();
+        }
+
+        private VideoContent toDomain(VideoEntity entity) {
+
+                VideoContent video = VideoContent.create(
+                                entity.getId(),
+                                entity.getTitle(),
+                                entity.getBucket(),
+                                entity.getObjectKey());
+
+                // reconstrução do estado
+                if (entity.getStatus() == null) {
+                        return video;
+                }
+
+                switch (entity.getStatus()) {
+                        case PROCESSING -> video.markProcessing();
+                        case READY -> {
+                                video.markProcessing();
+                                video.markReady(
+                                                entity.getDuration(),
+                                                entity.getSize(),
+                                                entity.getResolution(),
+                                                entity.getThumbnailUrl(),
+                                                entity.getHlsPlaylistUrl());
+                        }
+                        case FAILED -> {
+                                video.markProcessing();
+                                video.markFailed(entity.getProcessingError());
+                        }
+                        default -> {
+                        }
+                }
+
+                return video;
         }
 }

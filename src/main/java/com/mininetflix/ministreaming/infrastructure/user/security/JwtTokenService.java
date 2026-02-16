@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.mininetflix.ministreaming.application.user.port.TokenService;
 import com.mininetflix.ministreaming.domain.user.UserRole;
