@@ -5,134 +5,256 @@ Boot**, projetada com **Clean Architecture + DDD + Event-Driven
 Architecture**, simulando a base estrutural de uma plataforma de
 streaming moderna.
 
+### DIAGRAMA 1: CAMADA DE DOMÍNIO 
 ``` mermaid
-graph TD
-    %% =========================
-    %% DOMAIN
-    %% =========================
-    subgraph Domain
-        DC[content.VideoContent]
-        DS[content.VideoStatus]
-        DP[playback.PlaybackState]
-        DU[user.User]
-        DR[user.UserRole]
-        DE[exceptions: VideoNotFoundException, EmailAlreadyExistsException, BusinessException...]
+graph TB
+    title["CAMADA DE DOMÍNIO<br/>Regras de Negócio e Entidades"]
+    style title fill:#fff,stroke:none,font-family:Arial,font-size:16px,font-weight:bold
+
+    subgraph Dominio["ENTIDADES CENTRAIS"]
+        direction TB
+        
+        Video["Vídeo"]
+        Status["Status do Vídeo"]
+        Playback["Reprodução"]
+        Usuario[" Usuário"]
+        Perfil["Perfil de Acesso"]
+        
+        Video --> Status
+        Usuario --> Perfil
+        
+        subgraph Excecoes["EXCEÇÕES DE NEGÓCIO"]
+            Ex1["VideoNotFoundException<br/>Vídeo não encontrado"]
+            Ex2["EmailAlreadyExistsException<br/>E-mail já cadastrado"]
+            Ex3["BusinessException<br/>Regras de negócio"]
+        end
     end
 
-    %% =========================
-    %% APPLICATION
-    %% =========================
-    subgraph Application
-        AC1[content.usecase.UploadVideoUseCase]
-        AC2[content.usecase.ListVideosUseCase]
-        AC3[content.usecase.ProcessVideoUseCase]
-
-        AD1[content.port.VideoCatalogRepository]
-        AD2[content.port.VideoStorageService]
-        AD3[content.port.VideoMetadataExtractor]
-        AD4[content.port.VideoProcessingPublisher]
-
-        AP1[playback.usecase.StartPlaybackUseCase]
-        AP2[playback.usecase.GetPlaybackProgressUseCase]
-        AP3[playback.usecase.SavePlaybackProgressUseCase]
-
-        AU1[user.usecase.RegisterUserUseCase]
-        AU2[user.usecase.AuthenticateUserUseCase]
+    subgraph Responsabilidades["RESPONSABILIDADES"]
+        R1["• Define as entidades do sistema"]
+        R2["• Contém as regras de negócio"]
+        R3["• Independente de tecnologia"]
+        R4["• Núcleo da aplicação"]
     end
 
-    %% =========================
-    %% INFRASTRUCTURE
-    %% =========================
-    subgraph Infrastructure
-        IC1[content.repository.JpaVideoCatalogRepository]
-        IC2[content.repository.DataVideoJpaRepository]
-        IE1[content.entity.VideoEntity]
+    classDef titulo fill:#fff,stroke:none,font-family:Arial
+    classDef entidades fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px,color:#4a148c
+    classDef excecoes fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#b71c1c
+    classDef responsabilidades fill:#f5f5f5,stroke:#9e9e9e,stroke-width:1px,stroke-dasharray: 3 3
+    
+    class Video,Status,Playback,Usuario,Perfil entidades
+    class Ex1,Ex2,Ex3 excecoes
+    class R1,R2,R3,R4 responsabilidades
+```
+### DIAGRAMA 2: CAMADA DE APLICAÇÃO (Casos de Uso)
+```mermaid
+graph TB
+    title["CAMADA DE APLICAÇÃO<br/>Orquestração e Ports"]
+    style title fill:#fff,stroke:none,font-family:Arial,font-size:16px,font-weight:bold
 
-        IS1[content.storage.MinioVideoStorageService]
-
-        IM1[content.metadata.FFmpegMetadataExtractor]
-
-        IR1[messaging.RabbitVideoProcessingPublisher]
-        IR2[messaging.VideoProcessingConsumer]
-
-        IP1[playback.repository.PlaybackRepositoryImpl]
-        IP2[playback.repository.RedisPlaybackRepository]
-
-        IU1[user.persistence.UserJpaRepositoryAdapter]
-        IU2[user.persistence.UserJpaRepository]
-
-        ISec1[user.security.JwtTokenService]
-        ISec2[user.security.BCryptPasswordEncoderAdapter]
+    subgraph Aplicacao["CASOS DE USO"]
+        direction TB
+        
+        subgraph Content["MÓDULO DE CONTEÚDO"]
+            AC1["UploadVideoUseCase<br/>Upload de vídeos"]
+            AC2["ListVideosUseCase<br/>Listar catálogo"]
+            AC3["ProcessVideoUseCase<br/>Processar vídeo"]
+        end
+        
+        subgraph Playback["MÓDULO DE REPRODUÇÃO"]
+            AP1["StartPlaybackUseCase<br/>Iniciar reprodução"]
+            AP2["GetPlaybackProgressUseCase<br/>Obter progresso"]
+            AP3["SavePlaybackProgressUseCase<br/>Salvar progresso"]
+        end
+        
+        subgraph User["MÓDULO DE USUÁRIO"]
+            AU1["RegisterUserUseCase<br/>Registrar usuário"]
+            AU2["AuthenticateUserUseCase<br/>Autenticar"]
+        end
     end
 
-    %% =========================
-    %% WEB
-    %% =========================
-    subgraph Web
-        WC1[controller.content.VideoUploadController]
-        WC2[controller.content.VideoCatalogController]
-        WP1[controller.playback.PlaybackController]
-        WU1[controller.auth.AuthController]
+    subgraph Ports["PORTS (INTERFACES)"]
+        direction TB
+        P1["VideoCatalogRepository<br/>Repositório de vídeos"]
+        P2["VideoStorageService<br/>Armazenamento"]
+        P3["VideoMetadataExtractor<br/>Extrator de metadados"]
+        P4["VideoProcessingPublisher<br/>Publicador de processamento"]
     end
 
-    %% =========================
-    %% DOMAIN RELATIONS
-    %% =========================
-    DC --> DS
+    subgraph Fluxo["FLUXO DE EXECUÇÃO"]
+        F1["Controller → UseCase → Port → Infraestrutura"]
+        F2["UseCase → Domain (Regras de Negócio)"]
+    end
 
-    %% =========================
-    %% APPLICATION DEPENDENCIES
-    %% =========================
-    AC1 --> DC
-    AC1 --> AD1
-    AC1 --> AD2
-    AC1 --> AD4
+    AC1 --> P1 & P2 & P4
+    AC2 --> P1
+    AC3 --> P1 & P3
+    
+    classDef titulo fill:#fff,stroke:none
+    classDef usecase fill:#e3f2fd,stroke:#1565c0,stroke-width:3px,color:#0d47a1
+    classDef ports fill:#fff3e0,stroke:#ff6f00,stroke-width:2px,stroke-dasharray: 5 5
+    classDef fluxo fill:#e8f5e8,stroke:#2e7d32,stroke-width:1px
+    
+    class AC1,AC2,AC3,AP1,AP2,AP3,AU1,AU2 usecase
+    class P1,P2,P3,P4 ports
+    class F1,F2 fluxo
 
-    AC3 --> DC
-    AC3 --> AD1
-    AC3 --> AD3
+```
+### DIAGRAMA 3: CAMADA DE INFRAESTRUTURA (Implementações)
+```mermaid
+graph TB
+    title["CAMADA WEB<br/>Controllers e Rotas"]
+    style title fill:#fff,stroke:none,font-family:Arial,font-size:16px,font-weight:bold
 
-    AC2 --> AD1
+    subgraph Web["CONTROLLERS REST"]
+        direction TB
+        
+        C1["VideoUploadController"]
+        C2["VideoCatalogController"]
+        C3["PlaybackController"]
+        C4["AuthController"]
+    end
 
-    AP1 --> DP
-    AP2 --> DP
-    AP3 --> DP
+    subgraph Endpoints["ENDPOINTS DISPONÍVEIS"]
+        direction TB
+        
+        subgraph Content["Conteúdo"]
+            E1["POST /api/videos/upload"]
+            E2["GET /api/videos"]
+            E3["GET /api/videos/{id}"]
+        end
+        
+        subgraph Playback["Reprodução"]
+            E4["POST /api/playback/start"]
+            E5["GET /api/playback/progress/{id}"]
+            E6["PUT /api/playback/progress"]
+        end
+        
+        subgraph Auth["Autenticação"]
+            E7["POST /api/auth/register"]
+            E8["POST /api/auth/login"]
+        end
+    end
 
-    AU1 --> DU
-    AU2 --> DU
+    subgraph Dependencias["DEPENDÊNCIAS"]
+        D1["VideoUploadController → UploadVideoUseCase"]
+        D2["VideoCatalogController → ListVideosUseCase"]
+        D3["PlaybackController → PlaybackUseCases"]
+        D4["AuthController → AuthUseCases"]
+    end
 
-    %% =========================
-    %% WEB → APPLICATION
-    %% =========================
-    WC1 --> AC1
-    WC2 --> AC2
-    WP1 --> AP1
-    WP1 --> AP2
-    WP1 --> AP3
-    WU1 --> AU1
-    WU1 --> AU2
+    C1 --> Content
+    C2 --> Content
+    C3 --> Playback
+    C4 --> Auth
+    
+    classDef web fill:#fff3e0,stroke:#e65100,stroke-width:3px,color:#bf360c
+    classDef endpoints fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef deps fill:#f3e5f5,stroke:#7b1fa2,stroke-width:1px,stroke-dasharray: 3 3
+    
+    class C1,C2,C3,C4 web
+    class E1,E2,E3,E4,E5,E6,E7,E8 endpoints
+    class D1,D2,D3,D4 deps
+``` 
+### DIAGRAMA 4: CAMADA WEB (Interface com Usuário)
+```mermaid
+graph TB
+    title["CAMADA WEB<br/>Controllers e Rotas"]
+    style title fill:#fff,stroke:none,font-family:Arial,font-size:16px,font-weight:bold
 
-    %% =========================
-    %% INFRASTRUCTURE IMPLEMENTS PORTS
-    %% =========================
-    IC1 --> AD1
-    IS1 --> AD2
-    IM1 --> AD3
-    IR1 --> AD4
+    subgraph Web["CONTROLLERS REST"]
+        direction TB
+        
+        C1["VideoUploadController"]
+        C2["VideoCatalogController"]
+        C3["PlaybackController"]
+        C4["AuthController"]
+    end
 
-    IC2 --> IC1
-    IE1 --> IC1
+    subgraph Endpoints["ENDPOINTS DISPONÍVEIS"]
+        direction TB
+        
+        subgraph Content["Conteúdo"]
+            E1["POST /api/videos/upload"]
+            E2["GET /api/videos"]
+            E3["GET /api/videos/{id}"]
+        end
+        
+        subgraph Playback["Reprodução"]
+            E4["POST /api/playback/start"]
+            E5["GET /api/playback/progress/{id}"]
+            E6["PUT /api/playback/progress"]
+        end
+        
+        subgraph Auth["Autenticação"]
+            E7["POST /api/auth/register"]
+            E8["POST /api/auth/login"]
+        end
+    end
 
-    IR2 --> AC3
+    subgraph Dependencias["DEPENDÊNCIAS"]
+        D1["VideoUploadController → UploadVideoUseCase"]
+        D2["VideoCatalogController → ListVideosUseCase"]
+        D3["PlaybackController → PlaybackUseCases"]
+        D4["AuthController → AuthUseCases"]
+    end
 
-    IP1 --> AP1
-    IP2 --> AP3
+    C1 --> Content
+    C2 --> Content
+    C3 --> Playback
+    C4 --> Auth
+    
+    classDef web fill:#fff3e0,stroke:#e65100,stroke-width:3px,color:#bf360c
+    classDef endpoints fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef deps fill:#f3e5f5,stroke:#7b1fa2,stroke-width:1px,stroke-dasharray: 3 3
+    
+    class C1,C2,C3,C4 web
+    class E1,E2,E3,E4,E5,E6,E7,E8 endpoints
+    class D1,D2,D3,D4 deps
+```
+### DIAGRAMA 5: VISÃO GERAL DO FLUXO (Resumo)
+```mermaid
+graph LR
+    title["FLUXO COMPLETO DA APLICAÇÃO"]
+    style title fill:#fff,stroke:none,font-family:Arial,font-size:16px,font-weight:bold
 
-    IU1 --> AU1
-    IU2 --> IU1
+    User["USUÁRIO"]
+    
+    subgraph Web["WEB"]
+        Controller["Controllers REST"]
+    end
+    
+    subgraph App["APLICAÇÃO"]
+        UseCase["Casos de Uso"]
+        Ports["Ports"]
+    end
+    
+    subgraph Domain["DOMÍNIO"]
+        Entities["Entidades"]
+        Rules["Regras"]
+    end
+    
+    subgraph Infra["INFRAESTRUTURA"]
+        DB["PostgreSQL"]
+        Cache["Redis"]
+        Storage["MinIO"]
+        Queue["RabbitMQ"]
+    end
 
-    ISec1 --> AU2
-    ISec2 --> AU1
+    User --> Controller
+    Controller --> UseCase
+    UseCase --> Entities
+    UseCase --> Ports
+    Ports --> DB
+    Ports --> Cache
+    Ports --> Storage
+    Ports --> Queue
+    
+    style User fill:#ffebee,stroke:#c62828,stroke-width:2px
+    style Controller fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style UseCase,Ports fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    style Entities,Rules fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style DB,Cache,Storage,Queue fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
 ```
 ------------------------------------------------------------------------
 
@@ -205,7 +327,7 @@ O `VideoStatus` é a única fonte de verdade do estado do vídeo.
 
 ------------------------------------------------------------------------
 
-# ▶Playback
+# Playback
 
 -   Início de reprodução
 -   Salvamento de progresso
@@ -240,17 +362,8 @@ Serviços esperados:
 -   RabbitMQ
 -   Redis
 -   MinIO
+-   App( Java + ffmpeg)
 
-------------------------------------------------------------------------
-
-#  Estrutura do Projeto
-
-    com.mininetflix.ministreaming
-    │
-    ├── domain
-    ├── application
-    ├── infrastructure
-    └── web
 
 ------------------------------------------------------------------------
 
