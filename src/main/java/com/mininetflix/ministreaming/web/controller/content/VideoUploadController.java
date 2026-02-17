@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -53,5 +54,13 @@ public class VideoUploadController {
     public ResponseEntity<List<VideoContent>> list() {
         return ResponseEntity.ok(
                 catalogRepository.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<VideoContent> getById(@PathVariable String id) {
+
+        return catalogRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

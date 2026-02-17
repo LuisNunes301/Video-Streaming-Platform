@@ -14,165 +14,150 @@ graph TB
     subgraph Dominio["ENTIDADES CENTRAIS"]
         direction TB
         
-        Video["Vídeo"]
-        Status["Status do Vídeo"]
-        Playback["Reprodução"]
-        Usuario[" Usuário"]
-        Perfil["Perfil de Acesso"]
+        Video["VideoContent"]
+        Status["VideoStatus<br/>UPLOADING | PROCESSING | READY | FAILED"]
+        Playback["PlaybackState"]
+        Usuario["User"]
+        Perfil["UserRole"]
         
         Video --> Status
         Usuario --> Perfil
-        
-        subgraph Excecoes["EXCEÇÕES DE NEGÓCIO"]
-            Ex1["VideoNotFoundException<br/>Vídeo não encontrado"]
-            Ex2["EmailAlreadyExistsException<br/>E-mail já cadastrado"]
-            Ex3["BusinessException<br/>Regras de negócio"]
-        end
+    end
+
+    subgraph Excecoes["EXCEÇÕES DE NEGÓCIO"]
+        Ex1["VideoNotFoundException"]
+        Ex2["EmailAlreadyExistsException"]
+        Ex3["BusinessException"]
     end
 
     subgraph Responsabilidades["RESPONSABILIDADES"]
-        R1["• Define as entidades do sistema"]
-        R2["• Contém as regras de negócio"]
-        R3["• Independente de tecnologia"]
+        R1["• Define entidades e estados"]
+        R2["• Implementa transições válidas de status"]
+        R3["• Não depende de framework"]
         R4["• Núcleo da aplicação"]
     end
 
-    classDef titulo fill:#fff,stroke:none,font-family:Arial
-    classDef entidades fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px,color:#4a148c
-    classDef excecoes fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#b71c1c
+    classDef entidades fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px
+    classDef excecoes fill:#ffebee,stroke:#c62828,stroke-width:2px
     classDef responsabilidades fill:#f5f5f5,stroke:#9e9e9e,stroke-width:1px,stroke-dasharray: 3 3
     
     class Video,Status,Playback,Usuario,Perfil entidades
     class Ex1,Ex2,Ex3 excecoes
     class R1,R2,R3,R4 responsabilidades
+
 ```
 ### DIAGRAMA 2: CAMADA DE APLICAÇÃO (Casos de Uso)
 ```mermaid
 graph TB
-    title["CAMADA DE APLICAÇÃO<br/>Orquestração e Ports"]
+    title["CAMADA DE APLICAÇÃO<br/>Casos de Uso e Ports"]
     style title fill:#fff,stroke:none,font-family:Arial,font-size:16px,font-weight:bold
 
-    subgraph Aplicacao["CASOS DE USO"]
+    subgraph UseCases["CASOS DE USO"]
         direction TB
         
-        subgraph Content["MÓDULO DE CONTEÚDO"]
-            AC1["UploadVideoUseCase<br/>Upload de vídeos"]
-            AC2["ListVideosUseCase<br/>Listar catálogo"]
-            AC3["ProcessVideoUseCase<br/>Processar vídeo"]
-        end
+        UC1["UploadVideoUseCase"]
+        UC2["ListVideosUseCase"]
+        UC3["ProcessVideoUseCase"]
         
-        subgraph Playback["MÓDULO DE REPRODUÇÃO"]
-            AP1["StartPlaybackUseCase<br/>Iniciar reprodução"]
-            AP2["GetPlaybackProgressUseCase<br/>Obter progresso"]
-            AP3["SavePlaybackProgressUseCase<br/>Salvar progresso"]
-        end
+        UP1["StartPlaybackUseCase"]
+        UP2["GetPlaybackProgressUseCase"]
+        UP3["SavePlaybackProgressUseCase"]
         
-        subgraph User["MÓDULO DE USUÁRIO"]
-            AU1["RegisterUserUseCase<br/>Registrar usuário"]
-            AU2["AuthenticateUserUseCase<br/>Autenticar"]
-        end
+        UU1["RegisterUserUseCase"]
+        UU2["AuthenticateUserUseCase"]
     end
 
     subgraph Ports["PORTS (INTERFACES)"]
         direction TB
-        P1["VideoCatalogRepository<br/>Repositório de vídeos"]
-        P2["VideoStorageService<br/>Armazenamento"]
-        P3["VideoMetadataExtractor<br/>Extrator de metadados"]
-        P4["VideoProcessingPublisher<br/>Publicador de processamento"]
+        P1["VideoCatalogRepository"]
+        P2["VideoStorageService"]
+        P3["VideoMetadataExtractor"]
+        P4["VideoProcessingPublisher"]
+        P5["PlaybackRepository"]
+        P6["UserRepository"]
     end
 
-    subgraph Fluxo["FLUXO DE EXECUÇÃO"]
-        F1["Controller → UseCase → Port → Infraestrutura"]
-        F2["UseCase → Domain (Regras de Negócio)"]
-    end
-
-    AC1 --> P1 & P2 & P4
-    AC2 --> P1
-    AC3 --> P1 & P3
+    UC1 --> P1 & P2 & P4
+    UC2 --> P1
+    UC3 --> P1 & P3
     
-    classDef titulo fill:#fff,stroke:none
-    classDef usecase fill:#e3f2fd,stroke:#1565c0,stroke-width:3px,color:#0d47a1
+    UP1 --> P5
+    UP2 --> P5
+    UP3 --> P5
+    
+    UU1 --> P6
+    UU2 --> P6
+
+    classDef usecase fill:#e3f2fd,stroke:#1565c0,stroke-width:3px
     classDef ports fill:#fff3e0,stroke:#ff6f00,stroke-width:2px,stroke-dasharray: 5 5
-    classDef fluxo fill:#e8f5e8,stroke:#2e7d32,stroke-width:1px
     
-    class AC1,AC2,AC3,AP1,AP2,AP3,AU1,AU2 usecase
-    class P1,P2,P3,P4 ports
-    class F1,F2 fluxo
+    class UC1,UC2,UC3,UP1,UP2,UP3,UU1,UU2 usecase
+    class P1,P2,P3,P4,P5,P6 ports
+
 
 ```
 ### DIAGRAMA 3: CAMADA DE INFRAESTRUTURA (Implementações)
 ```mermaid
 graph TB
-    title["CAMADA WEB<br/>Controllers e Rotas"]
+    title["CAMADA DE INFRAESTRUTURA<br/>Implementações Técnicas"]
     style title fill:#fff,stroke:none,font-family:Arial,font-size:16px,font-weight:bold
 
-    subgraph Web["CONTROLLERS REST"]
-        direction TB
-        
-        C1["VideoUploadController"]
-        C2["VideoCatalogController"]
-        C3["PlaybackController"]
-        C4["AuthController"]
+    subgraph Persistencia["PERSISTÊNCIA"]
+        IR1["JpaVideoCatalogRepository"]
+        IR2["PlaybackRepositoryImpl"]
+        IR3["UserJpaRepositoryAdapter"]
+        DB["PostgreSQL"]
     end
 
-    subgraph Endpoints["ENDPOINTS DISPONÍVEIS"]
-        direction TB
-        
-        subgraph Content["Conteúdo"]
-            E1["POST /api/videos/upload"]
-            E2["GET /api/videos"]
-            E3["GET /api/videos/{id}"]
-        end
-        
-        subgraph Playback["Reprodução"]
-            E4["POST /api/playback/start"]
-            E5["GET /api/playback/progress/{id}"]
-            E6["PUT /api/playback/progress"]
-        end
-        
-        subgraph Auth["Autenticação"]
-            E7["POST /api/auth/register"]
-            E8["POST /api/auth/login"]
-        end
+    subgraph Storage["ARMAZENAMENTO"]
+        S1["MinioVideoStorageService"]
+        S2["MinIO Server"]
     end
 
-    subgraph Dependencias["DEPENDÊNCIAS"]
-        D1["VideoUploadController → UploadVideoUseCase"]
-        D2["VideoCatalogController → ListVideosUseCase"]
-        D3["PlaybackController → PlaybackUseCases"]
-        D4["AuthController → AuthUseCases"]
+    subgraph Mensageria["MENSAGERIA"]
+        M1["RabbitMQPublisher"]
+        M2["RabbitMQConsumer"]
+        M3["RabbitMQ Broker"]
     end
 
-    C1 --> Content
-    C2 --> Content
-    C3 --> Playback
-    C4 --> Auth
+    subgraph Processamento["PROCESSAMENTO"]
+        F1["FFmpeg (ProcessBuilder)"]
+        F2["VideoMetadataExtractorImpl"]
+    end
+
+    IR1 --> DB
+    IR2 --> DB
+    IR3 --> DB
     
-    classDef web fill:#fff3e0,stroke:#e65100,stroke-width:3px,color:#bf360c
-    classDef endpoints fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    classDef deps fill:#f3e5f5,stroke:#7b1fa2,stroke-width:1px,stroke-dasharray: 3 3
+    S1 --> S2
     
-    class C1,C2,C3,C4 web
-    class E1,E2,E3,E4,E5,E6,E7,E8 endpoints
-    class D1,D2,D3,D4 deps
+    M1 --> M3
+    M3 --> M2
+    
+    M2 --> F1
+    F1 --> S1
+
+    classDef infra fill:#e8f5e8,stroke:#2e7d32,stroke-width:3px
+    classDef externo fill:#fff3e0,stroke:#e65100,stroke-width:3px
+    
+    class IR1,IR2,IR3,S1,M1,M2,F1,F2 infra
+    class DB,S2,M3 externo
+
 ``` 
 ### DIAGRAMA 4: CAMADA WEB (Interface com Usuário)
 ```mermaid
 graph TB
-    title["CAMADA WEB<br/>Controllers e Rotas"]
+    title["CAMADA WEB<br/>Controllers REST"]
     style title fill:#fff,stroke:none,font-family:Arial,font-size:16px,font-weight:bold
 
-    subgraph Web["CONTROLLERS REST"]
-        direction TB
-        
+    subgraph Controllers["CONTROLLERS"]
         C1["VideoUploadController"]
         C2["VideoCatalogController"]
         C3["PlaybackController"]
         C4["AuthController"]
     end
 
-    subgraph Endpoints["ENDPOINTS DISPONÍVEIS"]
-        direction TB
+    subgraph Endpoints["ENDPOINTS"]
         
         subgraph Content["Conteúdo"]
             E1["POST /api/videos/upload"]
@@ -192,82 +177,51 @@ graph TB
         end
     end
 
-    subgraph Dependencias["DEPENDÊNCIAS"]
-        D1["VideoUploadController → UploadVideoUseCase"]
-        D2["VideoCatalogController → ListVideosUseCase"]
-        D3["PlaybackController → PlaybackUseCases"]
-        D4["AuthController → AuthUseCases"]
-    end
+    C1 --> E1
+    C2 --> E2 & E3
+    C3 --> E4 & E5 & E6
+    C4 --> E7 & E8
 
-    C1 --> Content
-    C2 --> Content
-    C3 --> Playback
-    C4 --> Auth
-    
-    classDef web fill:#fff3e0,stroke:#e65100,stroke-width:3px,color:#bf360c
+    classDef web fill:#fff3e0,stroke:#e65100,stroke-width:3px
     classDef endpoints fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    classDef deps fill:#f3e5f5,stroke:#7b1fa2,stroke-width:1px,stroke-dasharray: 3 3
     
     class C1,C2,C3,C4 web
     class E1,E2,E3,E4,E5,E6,E7,E8 endpoints
-    class D1,D2,D3,D4 deps
+
 ```
 ### DIAGRAMA 5: VISÃO GERAL DO FLUXO (Resumo)
 ```mermaid
 graph TB
-    title["PLATAFORMA DE VÍDEOS - ARQUITETURA EM DOCKER"]
+    title["PLATAFORMA DE VÍDEOS - ARQUITETURA FINAL EM DOCKER"]
     style title fill:#fff,stroke:none,font-family:Arial,font-size:20px,font-weight:bold
 
-    User(("👤 USUÁRIO"))
-    
+    User(("👤 Usuário"))
+
     subgraph Docker["DOCKER CONTAINERS"]
-        
-        App["APLICAÇÃO MONOLÍTICA<br/>Java + Spring Boot + FFmpeg<br/>Porta 8080"]
-        
-        DB["POSTGRESQL<br/>Banco de Dados<br/>Porta 5432"]
-        
-        Cache["REDIS<br/>Cache/Progresso<br/>Porta 6379"]
-        
-        Queue["RABBITMQ<br/>Filas<br/>Portas 5672,15672"]
-        
-        Storage["MINIO<br/>Armazenamento de Vídeos<br/>Portas 9000,9001"]
-        
-        %% Conexões principais
-        User <-->|HTTP/REST| App
-        App <-->|Dados| DB
-        App <-->|Cache| Cache
-        App <-->|Filas| Queue
-        App <-->|Arquivos| Storage
-        
-        %% Conexões internas
-        Queue -.->|Consumo| App
+
+        App["Spring Boot App<br/>Swagger + FFmpeg<br/>Porta 8080"]
+
+        DB["PostgreSQL<br/>Porta 5432"]
+
+        Queue["RabbitMQ<br/>5672 / 15672"]
+
+        Storage["MinIO<br/>9000 / 9001"]
+
+        User <-->|HTTP REST + Swagger| App
+        App <-->|JPA| DB
+        App <-->|Mensageria| Queue
+        App <-->|S3 API| Storage
+        Queue -.->|Evento Assíncrono| App
     end
-    
-    %% Legendas
-    subgraph Legenda["LEGENDA"]
-        L1[" Fluxo Síncrono (requisição/resposta)"]
-        L2["Fluxo Assíncrono (filas)"]
-        L3["Upload de vídeos usa RabbitMQ"]
-        L4["Reprodução acessa MinIO diretamente"]
-    end
-    
-    classDef user fill:#ffebee,stroke:#c62828,stroke-width:3px
-    classDef docker fill:#e1f5fe,stroke:#01579b,stroke-width:3px
+
     classDef app fill:#e3f2fd,stroke:#1565c0,stroke-width:3px
-    classDef db fill:#e8f5e8,stroke:#2e7d32,stroke-width:3px
-    classDef cache fill:#fff9c4,stroke:#f57f17,stroke-width:3px
-    classDef queue fill:#ffcc80,stroke:#e65100,stroke-width:3px
-    classDef storage fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px
-    classDef legenda fill:#f5f5f5,stroke:#9e9e9e,stroke-width:1px,stroke-dasharray: 3 3
-    
-    class User user
-    class Docker docker
+    classDef infra fill:#e8f5e8,stroke:#2e7d32,stroke-width:3px
+    classDef externo fill:#fff3e0,stroke:#e65100,stroke-width:3px
+
     class App app
-    class DB db
-    class Cache cache
-    class Queue queue
-    class Storage storage
-    class L1,L2,L3,L4 legenda
+    class DB,Queue,Storage infra
+
+
 ```
 ------------------------------------------------------------------------
 
@@ -280,7 +234,6 @@ graph TB
 -   Catálogo com controle de status
 -   Autenticação com JWT
 -   Persistência com JPA
--   Cache de playback com Redis
 -   Armazenamento de objetos com MinIO (S3 compatible)
 
 ------------------------------------------------------------------------
@@ -345,7 +298,6 @@ O `VideoStatus` é a única fonte de verdade do estado do vídeo.
 -   Início de reprodução
 -   Salvamento de progresso
 -   Recuperação de estado
--   Persistência em Redis
 
 ------------------------------------------------------------------------
 
@@ -354,8 +306,7 @@ O `VideoStatus` é a única fonte de verdade do estado do vídeo.
 -   Java 17+
 -   Spring Boot
 -   Spring Data JPA
--   RabbitMQ
--   Redis
+-   RabbitMQ   
 -   MinIO
 -   JWT
 -   FFmpeg
@@ -373,7 +324,6 @@ Serviços esperados:
 
 -   PostgreSQL
 -   RabbitMQ
--   Redis
 -   MinIO
 -   App( Java + ffmpeg)
 
